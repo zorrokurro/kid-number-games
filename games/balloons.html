@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>點氣球 | 數字樂園</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<div class="page">
+  <div class="panel">
+    <div class="hint" id="hint"></div>
+    <div class="sky" id="sky"></div>
+    <div class="feedback" id="fb"></div>
+  </div>
+</div>
+<script src="../js/common.js"></script>
+<script>
+const INSTR = '聽聽看！點爆畫面上數字正確的氣球！';
+const BCOLORS = ['#ff5f6f', '#54a7ff', '#43d19e', '#ffc63c', '#b06ef7', '#ff9d54'];
+let target = 0;
+let score = 0;
+const GOAL = 8;
+let spawnTimer = null;
+let locked = false;
+
+function setTarget() {
+  let n = randInt(1, 10);
+  while (n === target) n = randInt(1, 10);
+  target = n;
+  const h = document.getElementById('hint');
+  h.innerHTML = '點爆數字 <span class="num">' + target + '</span> 的氣球！ 🔊';
+  h.style.cursor = 'pointer';
+  h.onclick = () => Voice.speak('點爆數字 ' + CN_NUM[target] + ' 的氣球！');
+  Voice.speak('點爆數字 ' + CN_NUM[target] + ' 的氣球！');
+}
+function spawn(forceTarget) {
+  const sky = document.getElementById('sky');
+  if (sky.querySelectorAll('.balloon').length >= 7) return;
+  const b = document.createElement('div');
+  b.className = 'balloon';
+  const num = forceTarget ? target : (Math.random() < 0.4 ? target : randInt(1, 10));
+  b.textContent = num;
+  b.style.background = BCOLORS[randInt(0, BCOLORS.length - 1)];
+  b.style.left = randInt(2, 82) + '%';
+  const dur = randInt(9, 14);
+  b.style.animationDuration = dur + 's';
+  b.style.animationDelay = '0s';
+  b.dataset.v = num;
+  b.addEventListener('click', e => popBalloon(b, e));
+  sky.appendChild(b);
+  setTimeout(() => b.remove(), dur * 1000 + 100);
+}
+function ensureTarget() {
+  const sky = document.getElementById('sky');
+  const has = [...sky.querySelectorAll('.balloon')].some(el => el.textContent === String(target));
+  if (!has) spawn(true);
+}
+function popBalloon(b, e) {
+  if (locked) return;
+  const v = parseInt(b.textContent, 10);
+  if (v === target) {
+    Sfx.pop();
+    burst(e.clientX, e.clientY);
+    b.classList.add('boomf');
+    const fb = document.getElementById('fb');
+    score++;
+    fb.textContent = '✨ 砰！答對了！';
+    fb.className = 'feedback good';
+    addStar(1);
+    const sky = document.getElementById('sky');
+    if (score >= GOAL) {
+      locked = true;
+      clearInterval(spawnTimer);
+      sky.querySelectorAll('.balloon').forEach(el => el.remove());
+      setTimeout(() => showWin('點爆了 ' + GOAL + ' 顆氣球！共 ' + starN + ' 顆星星！', start), 700);
+      return;
+    }
+    addStar(1);
+    setTimeout(() => { setTarget(); spawn(true); }, 400);
+  } else {
+    Sfx.bad();
+    b.classList.remove('wiggle');
+    void b.offsetWidth;
+    b.classList.add('wiggle');
+    const fb = document.getElementById('fb');
+    if (fb) { fb.textContent = '去找數字 ' + target + ' 的氣球！'; fb.className = 'feedback badf'; }
+    Voice.speak('找一找，數字 ' + CN_NUM[target] + ' 的氣球！');
+  }
+  setTimeout(() => b.remove(), 250);
+}
+function start() {
+  starN = 0;
+  const e = document.getElementById('starN');
+  if (e) e.textContent = '0';
+  score = 0;
+  locked = false;
+  clearInterval(spawnTimer);
+  const sky = document.getElementById('sky');
+  sky.querySelectorAll('.balloon').forEach(el => el.remove());
+  const fb = document.getElementById('fb');
+  fb.textContent = '';
+  fb.className = 'feedback';
+  setTarget();
+  spawn(true);
+  spawnTimer = setInterval(() => {
+    spawn(false);
+    ensureTarget();
+  }, 1100);
+}
+buildHeader('🎈 點氣球', INSTR);
+start();
+</script>
+</body>
+</html>

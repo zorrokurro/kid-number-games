@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>連連看 | 數字樂園</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<div class="page">
+  <div class="panel dots-wrap">
+    <svg class="dots-svg" id="svg" viewBox="0 0 700 480"></svg>
+    <div class="feedback" id="fb"></div>
+    <div class="next-pill" id="nextPill">下一個數字：1</div>
+  </div>
+</div>
+<script src="../js/common.js"></script>
+<script>
+const INSTR = '從數字 1 開始，照著 1、2、3 的順序點點點，連出可愛的圖案！';
+const PICTURES = [
+  {
+    name: '星星',
+    pts: [[350,80],[396,187],[512,198],[424,274],[450,388],[350,328],[250,388],[276,274],[188,198],[304,187]],
+    reveal: '<polygon points="350,80 512,198 450,388 350,328 250,388 188,198 396,187" fill="#ffd24d" opacity="0.95"/>' +
+      '<polygon points="350,80 450,388 350,328 250,388" fill="#ffb63c" opacity="0.95"/>' +
+      '<circle cx="320" cy="235" r="8" fill="#5a4b8a"/><circle cx="380" cy="235" r="8" fill="#5a4b8a"/>' +
+      '<path d="M315 275 Q350 305 385 275" stroke="#5a4b8a" stroke-width="9" fill="none" stroke-linecap="round"/>' +
+      '<circle cx="298" cy="258" r="10" fill="#ffb3c1" opacity=".8"/><circle cx="402" cy="258" r="10" fill="#ffb3c1" opacity=".8"/>'
+  },
+  {
+    name: '房子',
+    pts: [[350,70],[540,170],[500,195],[500,400],[200,400],[200,195],[160,170]],
+    reveal: '<polygon points="350,70 540,170 160,170" fill="#ff6b6b" opacity="0.95"/>' +
+      '<rect x="200" y="195" width="300" height="205" fill="#ffe08a" opacity="0.95"/>' +
+      '<rect x="315" y="300" width="80" height="100" fill="#a06a3c" rx="8"/>' +
+      '<rect x="230" y="225" width="60" height="60" fill="#8fd8ff" rx="8" stroke="#fff" stroke-width="5"/>' +
+      '<rect x="410" y="225" width="60" height="60" fill="#8fd8ff" rx="8" stroke="#fff" stroke-width="5"/>'
+  },
+  {
+    name: '小魚',
+    pts: [[160,260],[330,140],[470,190],[590,120],[540,260],[590,400],[470,330],[330,360]],
+    reveal: '<polygon points="160,260 330,140 470,190 590,120 540,260 590,400 470,330 330,360" fill="#ff9d54" opacity="0.95"/>' +
+      '<polygon points="330,140 470,190 470,330 330,360" fill="#ffa64d" opacity="0.95"/>' +
+      '<circle cx="228" cy="228" r="15" fill="#fff"/><circle cx="234" cy="230" r="7" fill="#5a4b8a"/>' +
+      '<path d="M245 285 Q275 305 305 290" stroke="#5a4b8a" stroke-width="8" fill="none" stroke-linecap="round"/>' +
+      '<circle cx="110" cy="180" r="14" fill="none" stroke="#8fd8ff" stroke-width="5"/>' +
+      '<circle cx="90" cy="120" r="10" fill="none" stroke="#8fd8ff" stroke-width="5"/>'
+  }
+];
+let picIdx = 0;
+let step = 1;
+let linePts = [];
+let svg, poly, revealG;
+let done = false;
+
+function drawPicture() {
+  done = false;
+  step = 1;
+  linePts = [];
+  svg = document.getElementById('svg');
+  const p = PICTURES[picIdx];
+  svg.innerHTML = '<polyline id="poly" points="" fill="none" stroke="#ff5f6f" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>' +
+    '<g id="revealG" style="display:none" class="anim">' + p.reveal + '</g>';
+  poly = svg.querySelector('#poly');
+  revealG = svg.querySelector('#revealG');
+  p.pts.forEach((pt, i) => {
+    const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    g.classList.add('dot-g');
+    g.dataset.n = i + 1;
+    const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    c.setAttribute('cx', pt[0]);
+    c.setAttribute('cy', pt[1]);
+    c.setAttribute('r', 25);
+    const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    t.setAttribute('x', pt[0]);
+    t.setAttribute('y', pt[1] + 9);
+    t.textContent = i + 1;
+    g.appendChild(c);
+    g.appendChild(t);
+    g.addEventListener('click', () => clickDot(g, pt, i + 1));
+    svg.appendChild(g);
+  });
+  document.getElementById('nextPill').textContent = '下一個數字：1';
+  document.getElementById('fb').textContent = '';
+  document.getElementById('fb').className = 'feedback';
+  Voice.speak('我們來連' + p.name + '！先點數字 1！');
+}
+function clickDot(g, pt, n) {
+  if (done) return;
+  if (n !== step) {
+    Sfx.bad();
+    shake(document.querySelector('.dots-wrap'));
+    Voice.speak('先點數字 ' + step + ' 喔！');
+    return;
+  }
+  Sfx.pop();
+  g.classList.add('done');
+  linePts.push(pt[0] + ',' + pt[1]);
+  poly.setAttribute('points', linePts.join(' '));
+  const p = PICTURES[picIdx];
+  if (n === p.pts.length) {
+    done = true;
+    linePts.push(p.pts[0][0] + ',' + p.pts[0][1]);
+    poly.setAttribute('points', linePts.join(' '));
+    revealG.style.display = '';
+    Sfx.good();
+    addStar(2);
+    confetti(40);
+    const fb = document.getElementById('fb');
+    fb.textContent = '哇！你連出' + p.name + '了！';
+    fb.className = 'feedback good';
+    Voice.speak('太棒了！你連出' + p.name + '了！');
+    setTimeout(() => {
+      picIdx++;
+      if (picIdx >= PICTURES.length) {
+        showWin('全部連完了！共 ' + starN + ' 顆星星！', () => { picIdx = 0; start(); });
+      } else {
+        Voice.speak('再來連下一個圖案！');
+        drawPicture();
+      }
+    }, 2200);
+  } else {
+    step++;
+    document.getElementById('nextPill').textContent = '下一個數字：' + step;
+  }
+}
+function start() {
+  starN = 0;
+  const e = document.getElementById('starN');
+  if (e) e.textContent = '0';
+  picIdx = 0;
+  drawPicture();
+}
+buildHeader('⭐ 連連看', INSTR);
+start();
+</script>
+</body>
+</html>

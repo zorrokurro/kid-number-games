@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>記憶配對 | 數字樂園</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<div class="page">
+  <div class="panel">
+    <div class="hint" id="hint">翻翻卡片，把數字和一樣多的點點配對！</div>
+    <div class="grid4" id="grid"></div>
+    <div class="feedback" id="fb"></div>
+  </div>
+</div>
+<script src="../js/common.js"></script>
+<script>
+const INSTR = '翻翻卡片，找出數字和點點一樣多的那一對！';
+const SETS = [[1, 2, 3, 4], [2, 3, 4, 5], [3, 4, 6, 7], [5, 6, 7, 8]];
+let setIdx = 0;
+let openCards = [];
+let lock = false;
+let boardDone = 0;
+
+function dotLayout(n) {
+  const pos = [];
+  if (n === 1) pos.push([.5, .5]);
+  else if (n === 2) { pos.push([.3, .5], [.7, .5]); }
+  else if (n === 3) { pos.push([.3, .25], [.7, .25], [.5, .72]); }
+  else if (n === 4) { pos.push([.28, .28], [.72, .28], [.28, .72], [.72, .72]); }
+  else if (n === 5) { pos.push([.28, .28], [.72, .28], [.5, .5], [.28, .72], [.72, .72]); }
+  else if (n === 6) { pos.push([.28, .22], [.72, .22], [.28, .5], [.72, .5], [.28, .78], [.72, .78]); }
+  else {
+    for (let i = 0; i < n; i++) {
+      const ang = (i / n) * Math.PI * 2 - Math.PI / 2;
+      pos.push([.5 + .36 * Math.cos(ang), .5 + .34 * Math.sin(ang)]);
+    }
+  }
+  return pos;
+}
+function mkCard(kind, num) {
+  const c = document.createElement('button');
+  c.className = 'card';
+  c.dataset.v = num;
+  const inner = document.createElement('div');
+  inner.className = 'card-in';
+  const cover = document.createElement('div');
+  cover.className = 'face cover';
+  cover.textContent = '❓';
+  const front = document.createElement('div');
+  front.className = 'face front';
+  if (kind === 'num') {
+    front.textContent = num;
+    front.style.color = '#ff5f6f';
+  } else {
+    const box = document.createElement('div');
+    box.className = 'dots-in';
+    dotLayout(num).forEach(p => {
+      const d = document.createElement('span');
+      d.className = 'dot-item';
+      d.style.left = (p[0] * 100) + '%';
+      d.style.top = (p[1] * 100) + '%';
+      d.style.background = pick(PALETTE);
+      box.appendChild(d);
+    });
+    front.appendChild(box);
+  }
+  inner.appendChild(cover);
+  inner.appendChild(front);
+  c.appendChild(inner);
+  c.addEventListener('click', () => flip(c, kind, num));
+  return c;
+}
+function flip(c, kind, num) {
+  if (lock || c.classList.contains('open') || c.classList.contains('done')) return;
+  Sfx.click();
+  c.classList.add('open');
+  openCards.push({ c, kind, num });
+  if (openCards.length === 2) {
+    lock = true;
+    const a = openCards[0], b = openCards[1];
+    if (a.num === b.num && a.kind !== b.kind) {
+      Sfx.good();
+      a.c.classList.add('done');
+      b.c.classList.add('done');
+      a.c.classList.remove('open');
+      b.c.classList.remove('open');
+      const fb = document.getElementById('fb');
+      fb.textContent = '✨ 配對成功！';
+      fb.className = 'feedback good';
+      Voice.speak('配對成功！');
+      openCards = [];
+      lock = false;
+      if (document.querySelectorAll('.card.done').length === 8) {
+        addStar(3);
+        confetti(40);
+        setTimeout(nextBoard, 1400);
+      }
+    } else {
+      if (a.kind === b.kind && a.num === b.num) {
+        Voice.speak('要一張數字、一張點點喔！');
+      }
+      Sfx.bad();
+      setTimeout(() => {
+        a.c.classList.remove('open');
+        b.c.classList.remove('open');
+        openCards = [];
+        lock = false;
+      }, 850);
+    }
+  }
+}
+function buildBoard(nums) {
+  openCards = [];
+  lock = false;
+  const items = [];
+  nums.forEach(n => { items.push(['num', n], ['dots', n]); });
+  shuffle(items);
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  items.forEach(it => grid.appendChild(mkCard(it[0], it[1])));
+  const fb = document.getElementById('fb');
+  fb.textContent = '';
+  fb.className = 'feedback';
+}
+function nextBoard() {
+  boardDone++;
+  if (boardDone >= 3) {
+    showWin('配對全部完成！共 ' + starN + ' 顆星星！', start);
+    return;
+  }
+  setIdx++;
+  if (setIdx >= SETS.length) setIdx = 0;
+  document.getElementById('hint').textContent = '第 ' + (boardDone + 1) + ' 桌！加油！';
+  Voice.speak('好棒！再來一桌！');
+  buildBoard(SETS[setIdx]);
+}
+function start() {
+  starN = 0;
+  const e = document.getElementById('starN');
+  if (e) e.textContent = '0';
+  setIdx = 0;
+  boardDone = 0;
+  document.getElementById('hint').textContent = '翻翻卡片，把數字和一樣多的點點配對！';
+  buildBoard(SETS[0]);
+  Voice.speak('翻翻卡片，找出數字和點點一樣多的那一對！');
+}
+buildHeader('🃏 記憶配對', INSTR);
+start();
+</script>
+</body>
+</html>

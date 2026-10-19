@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>數字樂園 | 小朋友數學遊戲</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="page">
+  <div class="lobby-hero">
+    <h1>🔢 數字樂園</h1>
+    <p>歡迎來玩 5 個有趣的數字遊戲！點點卡片開始吧！</p>
+    <div class="lobby-stars">⭐ <span>收集到的星星：</span><b id="totalStars">0</b> <span>顆</span></div>
+  </div>
+  <div class="game-grid">
+    <a class="game-card card-c1" href="games/count.html" data-say="數一數，數數看有幾隻小魚！">
+      <span class="ico">🐠</span>
+      <div class="name">數一數</div>
+      <div class="desc">數數看有幾隻小魚？</div>
+    </a>
+    <a class="game-card card-c2" href="games/dots.html" data-say="連連看，按數字順序連出可愛的圖案！">
+      <span class="ico">⭐</span>
+      <div class="name">連連看</div>
+      <div class="desc">按 1、2、3 連出小動物！</div>
+    </a>
+    <a class="game-card card-c3" href="games/match.html" data-say="數字記憶配對，翻翻卡片找一樣的！">
+      <span class="ico">🃏</span>
+      <div class="name">記憶配對</div>
+      <div class="desc">翻翻卡片，找到一樣的數字！</div>
+    </a>
+    <a class="game-card card-c4" href="games/compare.html" data-say="比一比，哪一邊比較多呢？">
+      <span class="ico">🍎</span>
+      <div class="name">比一比</div>
+      <div class="desc">哪一邊的蘋果比較多？</div>
+    </a>
+    <a class="game-card card-c5" href="games/balloons.html" data-say="點氣球，點爆正確的數字氣球！">
+      <span class="ico">🎈</span>
+      <div class="name">點氣球</div>
+      <div class="desc">點爆數字正確的氣球！</div>
+    </a>
+  </div>
+  <p class="lobby-tip">🌈 玩遊戲收集星星，變成數字小達人！</p>
+</div>
+<script src="js/common.js"></script>
+<script>
+document.getElementById('totalStars').textContent = localStorage.getItem('kid_stars') || '0';
+document.querySelectorAll('.game-card').forEach(c => {
+  c.addEventListener('mouseenter', () => { try { Voice.speak(c.dataset.say); } catch (e) {} });
+});
+</script>
+</body>
+</html>

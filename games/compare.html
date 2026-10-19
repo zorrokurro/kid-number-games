@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>比一比 | 數字樂園</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<div class="page">
+  <div class="panel">
+    <div class="hint" id="hint">哪一邊比較多？點點看！</div>
+    <div class="cmp-box">
+      <div class="cmp-side cmp-left" id="left"></div>
+      <div class="cmp-side cmp-right" id="right"></div>
+    </div>
+    <div class="feedback" id="fb"></div>
+  </div>
+</div>
+<script src="../js/common.js"></script>
+<script>
+const INSTR = '比一比，點點看哪一邊比較多！';
+let round = 0;
+const TOTAL = 10;
+let leftN = 0, rightN = 0, mode = 'more';
+let locked = false;
+
+function fillSide(el, n, fruit) {
+  el.innerHTML = '';
+  for (let i = 0; i < n; i++) {
+    const s = document.createElement('span');
+    s.className = 'cmp-item';
+    s.textContent = fruit;
+    s.style.transform = 'rotate(' + randInt(-18, 18) + 'deg) scale(' + (0.9 + Math.random() * 0.25) + ')';
+    el.appendChild(s);
+  }
+}
+function newRound() {
+  locked = false;
+  round++;
+  if (round > TOTAL) {
+    showWin('你收集了 ' + starN + ' 顆星星！', start);
+    return;
+  }
+  const fruit = pick(['🍎', '🍓', '🍊', '🍇', '🍌']);
+  mode = Math.random() < 0.35 ? 'less' : 'more';
+  do {
+    leftN = randInt(1, 9);
+    rightN = randInt(1, 9);
+  } while (leftN === rightN);
+  fillSide(document.getElementById('left'), leftN, fruit);
+  fillSide(document.getElementById('right'), rightN, fruit);
+  document.getElementById('left').className = 'cmp-side cmp-left';
+  document.getElementById('right').className = 'cmp-side cmp-right';
+  const fb = document.getElementById('fb');
+  fb.textContent = '';
+  fb.className = 'feedback';
+  const h = document.getElementById('hint');
+  if (mode === 'more') {
+    h.innerHTML = '第 ' + round + ' / ' + TOTAL + ' 題：哪一邊<span style="color:#ff5f6f">比較多</span>？';
+    Voice.speak('哪一邊比較多？點點看！');
+  } else {
+    h.innerHTML = '第 ' + round + ' / ' + TOTAL + ' 題：哪一邊<span style="color:#54a7ff">比較少</span>？';
+    Voice.speak('哪一邊比較少？點點看！');
+  }
+}
+function choose(side, n, el) {
+  if (locked) return;
+  locked = true;
+  const other = side === 'left' ? rightN : leftN;
+  const ok = mode === 'more' ? n > other : n < other;
+  const fb = document.getElementById('fb');
+  if (ok) {
+    el.classList.add('cmp-ok');
+    Sfx.good();
+    addStar(1);
+    const word = mode === 'more' ? '多' : '少';
+    fb.textContent = '答對了！' + (side === 'left' ? '左邊' : '右邊') + '比較' + word + '！';
+    fb.className = 'feedback good';
+    Voice.speak('答對了！' + (side === 'left' ? '左邊' : '右邊') + '比較' + word + '！');
+    confetti(24);
+  } else {
+    Sfx.bad();
+    el.classList.add('cmp-bad');
+    shake(el);
+    fb.textContent = '再想一想！數一數蘋果！';
+    fb.className = 'feedback badf';
+    Voice.speak('再數一數，想一想！');
+  }
+  setTimeout(newRound, ok ? 1600 : 1800);
+}
+function start() {
+  starN = 0;
+  const e = document.getElementById('starN');
+  if (e) e.textContent = '0';
+  round = 0;
+  newRound();
+}
+buildHeader('🍎 比一比', INSTR);
+document.getElementById('left').addEventListener('click', () => choose('left', leftN, document.getElementById('left')));
+document.getElementById('right').addEventListener('click', () => choose('right', rightN, document.getElementById('right')));
+start();
+</script>
+</body>
+</html>
