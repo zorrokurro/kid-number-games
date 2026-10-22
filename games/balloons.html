@@ -10,12 +10,19 @@
 <div class="page">
   <div class="panel">
     <div class="hint" id="hint"></div>
-    <div class="pick" id="pick">
-      <button class="btn pink" data-m="1">🔁 換數字模式</button>
-      <button class="btn green" data-m="2">🎯 同一個數字</button>
-    </div>
+    <button class="btn orange icon" id="pickBtn">🎭 換玩法</button>
     <div class="sky" id="sky"></div>
     <div class="feedback" id="fb"></div>
+  </div>
+</div>
+<div class="pick-mask" id="pickMask">
+  <div class="win-card" style="font-size: 26px;">
+    <div class="big">🎭</div>
+    <div>想玩哪一種？</div>
+    <div class="row">
+      <button class="btn pink" data-m="1">🔁 換數字（8 顆）</button>
+      <button class="btn green" data-m="2">🎯 同一個數字（10 顆）</button>
+    </div>
   </div>
 </div>
 <script src="../js/common.js"></script>
@@ -77,7 +84,7 @@ function popBalloon(b, e) {
       locked = true;
       clearInterval(spawnTimer);
       sky.querySelectorAll('.balloon').forEach(el => el.remove());
-      setTimeout(() => showWin('點爆了 ' + goal + ' 顆氣球！共 ' + starN + ' 顆星星！', startPick), 700);
+      setTimeout(() => showWin('點爆了 ' + goal + ' 顆氣球！共 ' + starN + ' 顆星星！', startLevel), 700);
       return;
     }
     fb.textContent = '✨ 砰！答對了！';
@@ -123,24 +130,17 @@ function startLevel() {
     ensureTarget();
   }, 1800);
 }
-function startPick() {
-  clearInterval(spawnTimer);
-  locked = true;
-  const sky = document.getElementById('sky');
-  sky.querySelectorAll('.balloon').forEach(el => el.remove());
-  document.getElementById('fb').textContent = '';
-  document.getElementById('fb').className = 'feedback';
-  document.getElementById('hint').innerHTML = '🎭 選一個玩法開始吧！🔊';
-  document.getElementById('pick').classList.remove('hide');
-}
 function buildPicker() {
-  const pk = document.getElementById('pick');
-  pk.querySelectorAll('button').forEach(btn => {
+  document.getElementById('pickBtn').addEventListener('click', () => {
+    Sfx.click();
+    document.getElementById('pickMask').classList.add('show');
+  });
+  document.querySelectorAll('#pickMask button').forEach(btn => {
     btn.addEventListener('click', () => {
       mode = parseInt(btn.dataset.m, 10);
       goal = mode === 1 ? 8 : 10;
       locked = false;
-      pk.classList.add('hide');
+      document.getElementById('pickMask').classList.remove('show');
       Sfx.click();
       startLevel();
     });
@@ -148,7 +148,9 @@ function buildPicker() {
 }
 buildHeader('🎈 點氣球', INSTR);
 buildPicker();
-startPick();
+mode = 1;
+goal = 8;
+startLevel();
 </script>
 </body>
 </html>

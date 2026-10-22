@@ -201,6 +201,16 @@ body::after {
   flex-wrap: wrap;
 }
 .pick.hide { display: none; }
+.pick-mask {
+  position: fixed;
+  inset: 0;
+  background: rgba(90,75,138,.45);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 60;
+}
+.pick-mask.show { display: flex; }
 
 /* ===== count game ===== */
 .fish-box {
