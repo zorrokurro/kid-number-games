@@ -10,17 +10,22 @@
 <div class="page">
   <div class="panel">
     <div class="hint" id="hint"></div>
+    <div class="pick" id="pick">
+      <button class="btn pink" data-m="1">🔁 換數字模式</button>
+      <button class="btn green" data-m="2">🎯 同一個數字</button>
+    </div>
     <div class="sky" id="sky"></div>
     <div class="feedback" id="fb"></div>
   </div>
 </div>
 <script src="../js/common.js"></script>
 <script>
-const INSTR = '聽聽看！點爆畫面上數字正確的氣球！';
+const INSTR = '選一個玩法：換數字模式，或同一個數字大挑戰！';
 const BCOLORS = ['#ff5f6f', '#54a7ff', '#43d19e', '#ffc63c', '#b06ef7', '#ff9d54'];
 let target = 0;
 let score = 0;
-const GOAL = 8;
+let goal = 8;
+let mode = 1;
 let spawnTimer = null;
 let locked = false;
 
@@ -65,19 +70,20 @@ function popBalloon(b, e) {
     b.classList.add('boomf');
     const fb = document.getElementById('fb');
     score++;
-    fb.textContent = '✨ 砰！答對了！';
-    fb.className = 'feedback good';
     addStar(1);
     const sky = document.getElementById('sky');
-    if (score >= GOAL) {
+    if (mode === 2) updateHint();
+    if (score >= goal) {
       locked = true;
       clearInterval(spawnTimer);
       sky.querySelectorAll('.balloon').forEach(el => el.remove());
-      setTimeout(() => showWin('點爆了 ' + GOAL + ' 顆氣球！共 ' + starN + ' 顆星星！', start), 700);
+      setTimeout(() => showWin('點爆了 ' + goal + ' 顆氣球！共 ' + starN + ' 顆星星！', startPick), 700);
       return;
     }
-    addStar(1);
-    setTimeout(() => { setTarget(); spawn(true); }, 1500);
+    fb.textContent = '✨ 砰！答對了！';
+    fb.className = 'feedback good';
+    if (mode === 1) setTimeout(() => { setTarget(); spawn(true); }, 1500);
+    else spawn(true);
   } else {
     Sfx.bad();
     b.classList.remove('wiggle');
@@ -89,10 +95,13 @@ function popBalloon(b, e) {
   }
   setTimeout(() => b.remove(), 250);
 }
-function start() {
-  starN = 0;
-  const e = document.getElementById('starN');
-  if (e) e.textContent = '0';
+function updateHint() {
+  const h = document.getElementById('hint');
+  if (mode === 2) {
+    h.innerHTML = '這關點爆數字 <span class="num">' + target + '</span> 的氣球：<span class="num">' + score + ' / ' + goal + '</span>！';
+  }
+}
+function startLevel() {
   score = 0;
   locked = false;
   clearInterval(spawnTimer);
@@ -101,15 +110,45 @@ function start() {
   const fb = document.getElementById('fb');
   fb.textContent = '';
   fb.className = 'feedback';
-  setTarget();
+  if (mode === 1) {
+    setTarget();
+  } else {
+    target = randInt(1, 10);
+    updateHint();
+    Voice.speak('這關的數字是' + CN_NUM[target] + '，點爆' + CN_NUM[goal] + '顆就過關！');
+  }
   spawn(true);
   spawnTimer = setInterval(() => {
     spawn(false);
     ensureTarget();
   }, 1800);
 }
+function startPick() {
+  clearInterval(spawnTimer);
+  locked = true;
+  const sky = document.getElementById('sky');
+  sky.querySelectorAll('.balloon').forEach(el => el.remove());
+  document.getElementById('fb').textContent = '';
+  document.getElementById('fb').className = 'feedback';
+  document.getElementById('hint').innerHTML = '🎭 選一個玩法開始吧！🔊';
+  document.getElementById('pick').classList.remove('hide');
+}
+function buildPicker() {
+  const pk = document.getElementById('pick');
+  pk.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      mode = parseInt(btn.dataset.m, 10);
+      goal = mode === 1 ? 8 : 10;
+      locked = false;
+      pk.classList.add('hide');
+      Sfx.click();
+      startLevel();
+    });
+  });
+}
 buildHeader('🎈 點氣球', INSTR);
-start();
+buildPicker();
+startPick();
 </script>
 </body>
 </html>

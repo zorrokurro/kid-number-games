@@ -193,6 +193,14 @@ body::after {
   margin-bottom: 14px;
 }
 .hint .num { color: #ff5f6f; font-size: 40px; }
+.pick {
+  display: flex;
+  gap: 18px;
+  justify-content: center;
+  margin: 6px 0 16px;
+  flex-wrap: wrap;
+}
+.pick.hide { display: none; }
 
 /* ===== count game ===== */
 .fish-box {
