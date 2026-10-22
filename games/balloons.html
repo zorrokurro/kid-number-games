@@ -43,7 +43,7 @@ function spawn(forceTarget) {
   b.textContent = num;
   b.style.background = BCOLORS[randInt(0, BCOLORS.length - 1)];
   b.style.left = randInt(2, 82) + '%';
-  const dur = randInt(9, 14);
+  const dur = randInt(16, 24);
   b.style.animationDuration = dur + 's';
   b.style.animationDelay = '0s';
   b.dataset.v = num;
@@ -77,7 +77,7 @@ function popBalloon(b, e) {
       return;
     }
     addStar(1);
-    setTimeout(() => { setTarget(); spawn(true); }, 400);
+    setTimeout(() => { setTarget(); spawn(true); }, 1500);
   } else {
     Sfx.bad();
     b.classList.remove('wiggle');
@@ -106,7 +106,7 @@ function start() {
   spawnTimer = setInterval(() => {
     spawn(false);
     ensureTarget();
-  }, 1100);
+  }, 1800);
 }
 buildHeader('🎈 點氣球', INSTR);
 start();

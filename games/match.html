@@ -17,11 +17,33 @@
 <script src="../js/common.js"></script>
 <script>
 const INSTR = '翻翻卡片，找出數字和點點一樣多的那一對！';
-const SETS = [[1, 2, 3, 4], [2, 3, 4, 5], [3, 4, 6, 7], [5, 6, 7, 8]];
-let setIdx = 0;
 let openCards = [];
 let lock = false;
 let boardDone = 0;
+
+function pickNums() {
+  return shuffle([1, 2, 3, 4, 5, 6, 7, 8, 9]).slice(0, 4).sort((a, b) => a - b);
+}
+function safeShuffle(items) {
+  let best = null;
+  for (let t = 0; t < 300; t++) {
+    const s = shuffle(items);
+    const pos = {};
+    s.forEach((it, i) => { pos[it[1]] = i; });
+    let ok = true;
+    const keys = Object.keys(pos);
+    for (let i = 0; i < keys.length; i++) {
+      for (let j = i + 1; j < keys.length; j++) {
+        const d = Math.abs(pos[keys[i]] - pos[keys[j]]);
+        if (d === 1 || d === 4 || d === 7) { ok = false; break; }
+      }
+      if (!ok) break;
+    }
+    if (ok) return s;
+    if (t === 299) best = s;
+  }
+  return best || shuffle(items);
+}
 
 function dotLayout(n) {
   const pos = [];
@@ -116,10 +138,9 @@ function buildBoard(nums) {
   lock = false;
   const items = [];
   nums.forEach(n => { items.push(['num', n], ['dots', n]); });
-  shuffle(items);
   const grid = document.getElementById('grid');
   grid.innerHTML = '';
-  items.forEach(it => grid.appendChild(mkCard(it[0], it[1])));
+  safeShuffle(items).forEach(it => grid.appendChild(mkCard(it[0], it[1])));
   const fb = document.getElementById('fb');
   fb.textContent = '';
   fb.className = 'feedback';
@@ -130,20 +151,17 @@ function nextBoard() {
     showWin('配對全部完成！共 ' + starN + ' 顆星星！', start);
     return;
   }
-  setIdx++;
-  if (setIdx >= SETS.length) setIdx = 0;
   document.getElementById('hint').textContent = '第 ' + (boardDone + 1) + ' 桌！加油！';
   Voice.speak('好棒！再來一桌！');
-  buildBoard(SETS[setIdx]);
+  buildBoard(pickNums());
 }
 function start() {
   starN = 0;
   const e = document.getElementById('starN');
   if (e) e.textContent = '0';
-  setIdx = 0;
   boardDone = 0;
   document.getElementById('hint').textContent = '翻翻卡片，把數字和一樣多的點點配對！';
-  buildBoard(SETS[0]);
+  buildBoard(pickNums());
   Voice.speak('翻翻卡片，找出數字和點點一樣多的那一對！');
 }
 buildHeader('🃏 記憶配對', INSTR);

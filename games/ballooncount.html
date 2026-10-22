@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>數數氣球 | 數字樂園</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<div class="page">
+  <div class="panel">
+    <div class="hint" id="hint"></div>
+    <div class="sky" id="sky" style="height: 440px;">
+      <div class="count-row" id="row"></div>
+      <div class="count-floor"></div>
+    </div>
+    <div class="feedback" id="fb"></div>
+  </div>
+</div>
+<script src="../js/common.js"></script>
+<script>
+const INSTR = '照 1、2、3 的順序點爆氣球，大聲跟著數！';
+const ROUNDS = [5, 6, 7, 8, 9, 10];
+let roundIdx = 0;
+let next = 1;
+let total = 0;
+let locked = false;
+
+function buildRound(n) {
+  next = 1;
+  const row = document.getElementById('row');
+  row.innerHTML = '';
+  const colors = shuffle(BCOLORS.slice());
+  shuffle(Array.from({ length: n }, (_, i) => i + 1)).forEach((num, i) => {
+    const b = document.createElement('div');
+    b.className = 'balloon count-b';
+    b.textContent = num;
+    b.style.background = colors[i % colors.length];
+    b.style.marginTop = randInt(0, 26) + 'px';
+    b.style.transform = 'rotate(' + randInt(-8, 8) + 'deg)';
+    b.addEventListener('click', () => clickB(b, num));
+    row.appendChild(b);
+  });
+  updateHint();
+  const fb = document.getElementById('fb');
+  fb.textContent = '';
+  fb.className = 'feedback';
+  Voice.speak('我們來數到' + CN_NUM[n] + '！先點數字一！');
+}
+function updateHint() {
+  document.getElementById('hint').innerHTML =
+    '第 ' + (roundIdx + 1) + ' / ' + ROUNDS.length + ' 輪：照順序點 <span class="num">' + next + '</span> （已數到 ' + (next - 1) + '）';
+}
+function clickB(b, num) {
+  if (locked || b.classList.contains('popped')) return;
+  if (num !== next) {
+    Sfx.bad();
+    b.classList.remove('wiggle');
+    void b.offsetWidth;
+    b.classList.add('wiggle');
+    const fb = document.getElementById('fb');
+    fb.textContent = '先點數字 ' + next + ' 的氣球！';
+    fb.className = 'feedback badf';
+    Voice.speak('先點數字' + CN_NUM[next] + '的氣球！');
+    return;
+  }
+  Sfx.pop();
+  b.classList.add('popped');
+  const fb = document.getElementById('fb');
+  fb.textContent = '✨ ' + CN_NUM[num] + '！數對了！';
+  fb.className = 'feedback good';
+  Voice.speak(CN_NUM[num] + '！');
+  addStar(1);
+  burst.call(null, ...pos(b));
+  total = num;
+  if (next === ROUNDS[roundIdx]) {
+    locked = true;
+    confetti(40);
+    Sfx.good();
+    setTimeout(() => {
+      locked = false;
+      roundIdx++;
+      if (roundIdx >= ROUNDS.length) {
+        showWin('你會數到十了！共 ' + starN + ' 顆星星！', start);
+        return;
+      }
+      Voice.speak(CN_NUM[ROUNDS[roundIdx - 1]] + '個氣球，好棒！下一輪！');
+      buildRound(ROUNDS[roundIdx]);
+    }, 1800);
+  } else {
+    next++;
+    updateHint();
+  }
+}
+function pos(el) {
+  const r = el.getBoundingClientRect();
+  return [r.left + r.width / 2, r.top + r.height / 2];
+}
+function start() {
+  starN = 0;
+  const e = document.getElementById('starN');
+  if (e) e.textContent = '0';
+  roundIdx = 0;
+  locked = false;
+  buildRound(ROUNDS[0]);
+}
+buildHeader('🎈 數數氣球', INSTR);
+start();
+</script>
+</body>
+</html>

@@ -155,6 +155,20 @@ body::after {
 .card-c3 { background: linear-gradient(160deg, #ff7eb3, #b06ef7); }
 .card-c4 { background: linear-gradient(160deg, #52d6a0, #2ba5e0); }
 .card-c5 { background: linear-gradient(160deg, #ffd24d, #ff9d3c); }
+.card-c6 { background: linear-gradient(160deg, #ff8fa3, #e0526e); }
+.cmp-num {
+  position: absolute;
+  top: 8px; left: 50%;
+  transform: translateX(-50%);
+  font-size: 64px;
+  font-weight: 900;
+  color: #ff5f6f;
+  text-shadow: 0 3px 0 #fff, 0 5px 8px rgba(0,0,0,.15);
+  display: none;
+}
+.cmp-num.show { display: block; }
+.cmp-left  { background: #eaf6ff; position: relative; }
+.cmp-right { background: #fff1f4; position: relative; }
 .lobby-tip {
   text-align: center;
   margin-top: 30px;
@@ -178,7 +192,7 @@ body::after {
   color: #5a4b8a;
   margin-bottom: 14px;
 }
-.hint .num { color: #ff5f6f; font-size: 32px; }
+.hint .num { color: #ff5f6f; font-size: 40px; }
 
 /* ===== count game ===== */
 .fish-box {
@@ -378,12 +392,9 @@ body::after {
   transition: transform .12s, border-color .2s;
 }
 .cmp-side:hover { transform: scale(1.02); }
-.cmp-left  { background: #eaf6ff; }
-.cmp-right { background: #fff1f4; }
 .cmp-item { font-size: 46px; filter: drop-shadow(0 3px 2px rgba(0,0,0,.12)); }
 .cmp-ok { border-color: #43d19e !important; background: #e9fff5 !important; }
 .cmp-bad { border-color: #ff5f6f !important; }
-
 /* ===== balloons ===== */
 .sky {
   position: relative;
@@ -396,10 +407,11 @@ body::after {
 }
 .balloon {
   position: absolute;
-  width: 78px; height: 96px;
+  bottom: -150px;
+  width: 82px; height: 100px;
   border-radius: 50% 50% 46% 46% / 44% 44% 52% 52%;
   color: #fff;
-  font-size: 40px;
+  font-size: 44px;
   font-weight: 900;
   display: flex;
   align-items: center;
@@ -414,13 +426,13 @@ body::after {
 .balloon::after {
   content: '';
   position: absolute;
-  bottom: -44px; left: 50%;
-  width: 2px; height: 46px;
+  bottom: -48px; left: 50%;
+  width: 2px; height: 50px;
   background: rgba(90,75,138,.5);
 }
 @keyframes rise {
   from { transform: translateY(0); }
-  to { transform: translateY(-720px); }
+  to { transform: translateY(-760px); }
 }
 .mini { position: fixed; width: 12px; height: 12px; border-radius: 50%; z-index: 99; pointer-events: none; animation: mini .55s ease-out forwards; }
 @keyframes mini {
@@ -429,6 +441,48 @@ body::after {
 .boomf { animation: boom .18s ease forwards; }
 @keyframes boom { to { transform: scale(1.6); opacity: 0; } }
 .wiggle { animation: wiggle .4s ease; }
+.count-b {
+  position: relative;
+  bottom: auto;
+  width: 96px; height: 110px;
+  font-size: 52px;
+  border-radius: 50% 50% 48% 48% / 40% 40% 56% 56%;
+  animation: none !important;
+  flex-direction: column;
+}
+.count-b .st {
+  position: absolute;
+  bottom: -46px;
+  width: 34px; height: 34px;
+  background: #ffc63c;
+  color: #fff;
+  font-size: 22px;
+  font-weight: 900;
+  border-radius: 50%;
+  border: 3px solid #fff;
+  box-shadow: 0 3px 5px rgba(0,0,0,.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.count-b.popped { visibility: hidden; transition: none; }
+.count-floor {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 26px;
+  background: linear-gradient(180deg, #9bde9a, #58b95e);
+  border-radius: 0 0 26px 26px;
+}
+.count-row {
+  position: absolute;
+  bottom: 22px; left: 0; right: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 18px;
+  padding: 0 12px;
+}
 @keyframes wiggle {
   25% { transform: translateX(-8px) rotate(-4deg); }
   75% { transform: translateX(8px) rotate(4deg); }

@@ -11,8 +11,8 @@
   <div class="panel">
     <div class="hint" id="hint">哪一邊比較多？點點看！</div>
     <div class="cmp-box">
-      <div class="cmp-side cmp-left" id="left"></div>
-      <div class="cmp-side cmp-right" id="right"></div>
+      <div class="cmp-side cmp-left" id="left"><div class="cmp-num" id="numL"></div></div>
+      <div class="cmp-side cmp-right" id="right"><div class="cmp-num" id="numR"></div></div>
     </div>
     <div class="feedback" id="fb"></div>
   </div>
@@ -50,6 +50,10 @@ function newRound() {
   } while (leftN === rightN);
   fillSide(document.getElementById('left'), leftN, fruit);
   fillSide(document.getElementById('right'), rightN, fruit);
+  const numL = document.getElementById('numL');
+  const numR = document.getElementById('numR');
+  numL.classList.remove('show');
+  numR.classList.remove('show');
   document.getElementById('left').className = 'cmp-side cmp-left';
   document.getElementById('right').className = 'cmp-side cmp-right';
   const fb = document.getElementById('fb');
@@ -87,6 +91,10 @@ function choose(side, n, el) {
     fb.className = 'feedback badf';
     Voice.speak('再數一數，想一想！');
   }
+  document.getElementById('numL').textContent = leftN;
+  document.getElementById('numR').textContent = rightN;
+  document.getElementById('numL').classList.add('show');
+  document.getElementById('numR').classList.add('show');
   setTimeout(newRound, ok ? 1600 : 1800);
 }
 function start() {
