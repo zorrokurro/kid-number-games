@@ -11,28 +11,34 @@
   <div class="panel">
     <div class="hint" id="hint">哪一邊比較多？點點看！</div>
     <div class="cmp-box">
-      <div class="cmp-side cmp-left" id="left"><div class="cmp-num" id="numL"></div></div>
-      <div class="cmp-side cmp-right" id="right"><div class="cmp-num" id="numR"></div></div>
+      <div class="cmp-side cmp-left" id="left">
+        <div class="cmp-num" id="numL"></div>
+        <div class="cmp-items" id="leftItems"></div>
+      </div>
+      <div class="cmp-side cmp-right" id="right">
+        <div class="cmp-num" id="numR"></div>
+        <div class="cmp-items" id="rightItems"></div>
+      </div>
     </div>
     <div class="feedback" id="fb"></div>
   </div>
 </div>
 <script src="../js/common.js"></script>
 <script>
-const INSTR = '比一比，點點看哪一邊比較多！';
+const INSTR = '比一比，點點看哪一邊比較多！答完會告訴你兩邊各有幾個！';
 let round = 0;
 const TOTAL = 10;
 let leftN = 0, rightN = 0, mode = 'more';
 let locked = false;
 
-function fillSide(el, n, fruit) {
-  el.innerHTML = '';
+function fillSide(box, n, fruit) {
+  box.innerHTML = '';
   for (let i = 0; i < n; i++) {
     const s = document.createElement('span');
     s.className = 'cmp-item';
     s.textContent = fruit;
     s.style.transform = 'rotate(' + randInt(-18, 18) + 'deg) scale(' + (0.9 + Math.random() * 0.25) + ')';
-    el.appendChild(s);
+    box.appendChild(s);
   }
 }
 function newRound() {
@@ -48,14 +54,14 @@ function newRound() {
     leftN = randInt(1, 9);
     rightN = randInt(1, 9);
   } while (leftN === rightN);
-  fillSide(document.getElementById('left'), leftN, fruit);
-  fillSide(document.getElementById('right'), rightN, fruit);
+  fillSide(document.getElementById('leftItems'), leftN, fruit);
+  fillSide(document.getElementById('rightItems'), rightN, fruit);
+  document.getElementById('left').className = 'cmp-side cmp-left';
+  document.getElementById('right').className = 'cmp-side cmp-right';
   const numL = document.getElementById('numL');
   const numR = document.getElementById('numR');
   numL.classList.remove('show');
   numR.classList.remove('show');
-  document.getElementById('left').className = 'cmp-side cmp-left';
-  document.getElementById('right').className = 'cmp-side cmp-right';
   const fb = document.getElementById('fb');
   fb.textContent = '';
   fb.className = 'feedback';
@@ -74,6 +80,12 @@ function choose(side, n, el) {
   const other = side === 'left' ? rightN : leftN;
   const ok = mode === 'more' ? n > other : n < other;
   const fb = document.getElementById('fb');
+  const numL = document.getElementById('numL');
+  const numR = document.getElementById('numR');
+  numL.textContent = leftN;
+  numR.textContent = rightN;
+  numL.classList.add('show');
+  numR.classList.add('show');
   if (ok) {
     el.classList.add('cmp-ok');
     Sfx.good();
@@ -85,17 +97,14 @@ function choose(side, n, el) {
     confetti(24);
   } else {
     Sfx.bad();
+    showCross(...elCenter(el));
     el.classList.add('cmp-bad');
     shake(el);
-    fb.textContent = '再想一想！數一數蘋果！';
+    fb.textContent = '再想一想！數一數水果！';
     fb.className = 'feedback badf';
     Voice.speak('再數一數，想一想！');
   }
-  document.getElementById('numL').textContent = leftN;
-  document.getElementById('numR').textContent = rightN;
-  document.getElementById('numL').classList.add('show');
-  document.getElementById('numR').classList.add('show');
-  setTimeout(newRound, ok ? 1600 : 1800);
+  setTimeout(newRound, ok ? 1800 : 2200);
 }
 function start() {
   starN = 0;

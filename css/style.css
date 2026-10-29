@@ -211,6 +211,32 @@ body::after {
   z-index: 60;
 }
 .pick-mask.show { display: flex; }
+.cross-mark {
+  position: fixed;
+  transform: translate(-50%, -50%);
+  font-size: 110px;
+  z-index: 98;
+  pointer-events: none;
+  animation: crossin .85s ease forwards;
+  filter: drop-shadow(0 6px 10px rgba(0,0,0,.3));
+}
+@keyframes crossin {
+  0% { transform: translate(-50%,-50%) scale(.3) rotate(-20deg); opacity: 0; }
+  30% { transform: translate(-50%,-50%) scale(1.25) rotate(5deg); opacity: 1; }
+  70% { transform: translate(-50%,-50%) scale(1) rotate(0); opacity: 1; }
+  100% { transform: translate(-50%,-50%) scale(1); opacity: 0; }
+}
+.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; max-width: 620px; margin: 0 auto; }
+.grid3 .card { height: 175px; }
+.cmp-items {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: center;
+  gap: 10px;
+  padding: 58px 14px 14px;
+  min-height: 240px;
+}
 
 /* ===== count game ===== */
 .fish-box {
@@ -466,22 +492,6 @@ body::after {
   font-size: 52px;
   border-radius: 50% 50% 48% 48% / 40% 40% 56% 56%;
   animation: none !important;
-  flex-direction: column;
-}
-.count-b .st {
-  position: absolute;
-  bottom: -46px;
-  width: 34px; height: 34px;
-  background: #ffc63c;
-  color: #fff;
-  font-size: 22px;
-  font-weight: 900;
-  border-radius: 50%;
-  border: 3px solid #fff;
-  box-shadow: 0 3px 5px rgba(0,0,0,.25);
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 .count-b.popped { visibility: hidden; transition: none; }
 .count-floor {

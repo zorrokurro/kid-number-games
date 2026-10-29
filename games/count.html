@@ -79,6 +79,7 @@ function choose(btn, v) {
     setTimeout(next, 1800);
   } else {
     Sfx.bad();
+    showCross(...elCenter(btn));
     shake(btn);
     fb.textContent = '再數數看！';
     fb.className = 'feedback badf';

@@ -55,6 +55,7 @@ function clickB(b, num) {
   if (locked || b.classList.contains('popped')) return;
   if (num !== next) {
     Sfx.bad();
+    showCross(...pos(b));
     b.classList.remove('wiggle');
     void b.offsetWidth;
     b.classList.add('wiggle');

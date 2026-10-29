@@ -35,6 +35,8 @@ let goal = 8;
 let mode = 1;
 let spawnTimer = null;
 let locked = false;
+let popLock = false;
+let levelId = 0;
 
 function setTarget() {
   let n = randInt(1, 10);
@@ -51,7 +53,10 @@ function spawn(forceTarget) {
   if (sky.querySelectorAll('.balloon').length >= 7) return;
   const b = document.createElement('div');
   b.className = 'balloon';
-  const num = forceTarget ? target : (Math.random() < 0.4 ? target : randInt(1, 10));
+  let num = randInt(1, 10);
+  if (forceTarget) num = target;
+  else if (mode === 1 && Math.random() < 0.4) num = target;
+  else if (mode === 2 && num === target) num = (target % 10) + 1;
   b.textContent = num;
   b.style.background = BCOLORS[randInt(0, BCOLORS.length - 1)];
   b.style.left = randInt(2, 82) + '%';
@@ -64,17 +69,25 @@ function spawn(forceTarget) {
   setTimeout(() => b.remove(), dur * 1000 + 100);
 }
 function ensureTarget() {
+  if (popLock) return;
   const sky = document.getElementById('sky');
   const has = [...sky.querySelectorAll('.balloon')].some(el => el.textContent === String(target));
   if (!has) spawn(true);
 }
 function popBalloon(b, e) {
-  if (locked) return;
+  if (locked || popLock) return;
   const v = parseInt(b.textContent, 10);
   if (v === target) {
     Sfx.pop();
     burst(e.clientX, e.clientY);
     b.classList.add('boomf');
+    popLock = true;
+    const id = levelId;
+    setTimeout(() => {
+      if (id !== levelId) return;
+      popLock = false;
+      if (mode === 2 && score < goal) spawn(true);
+    }, 1200);
     const fb = document.getElementById('fb');
     score++;
     addStar(1);
@@ -89,10 +102,17 @@ function popBalloon(b, e) {
     }
     fb.textContent = '✨ 砰！答對了！';
     fb.className = 'feedback good';
-    if (mode === 1) setTimeout(() => { setTarget(); spawn(true); }, 1500);
-    else spawn(true);
+    if (mode === 1) {
+      const id2 = levelId;
+      setTimeout(() => {
+        if (id2 !== levelId) return;
+        setTarget();
+        spawn(true);
+      }, 1500);
+    }
   } else {
     Sfx.bad();
+    showCross(e.clientX, e.clientY);
     b.classList.remove('wiggle');
     void b.offsetWidth;
     b.classList.add('wiggle');
@@ -109,6 +129,7 @@ function updateHint() {
   }
 }
 function startLevel() {
+  levelId++;
   score = 0;
   locked = false;
   clearInterval(spawnTimer);
@@ -122,7 +143,7 @@ function startLevel() {
   } else {
     target = randInt(1, 10);
     updateHint();
-    Voice.speak('這關的數字是' + CN_NUM[target] + '，點爆' + CN_NUM[goal] + '顆就過關！');
+    Voice.speak('這關的數字是' + CN_NUM[target] + '，一次點一顆，點爆' + CN_NUM[goal] + '顆就過關！');
   }
   spawn(true);
   spawnTimer = setInterval(() => {

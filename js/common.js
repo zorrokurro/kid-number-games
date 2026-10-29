@@ -47,7 +47,7 @@ const Sfx = {
   click() { beep(600, 0.08, 'triangle', 0.25); },
   pop() { beep(700, 0.06, 'square', 0.3); beep(320, 0.14, 'sine', 0.25, 0.04); },
   good() { beep(523, 0.12, 'triangle', 0.3); beep(659, 0.12, 'triangle', 0.3, 0.1); beep(784, 0.2, 'triangle', 0.3, 0.2); },
-  bad() { beep(200, 0.28, 'sawtooth', 0.18); },
+  bad() { beep(300, 0.14, 'square', 0.25); beep(210, 0.2, 'square', 0.25, 0.14); beep(140, 0.3, 'square', 0.22, 0.32); },
   win() { [523, 659, 784, 1047].forEach((f, i) => beep(f, 0.18, 'triangle', 0.3, i * 0.12)); beep(1319, 0.4, 'triangle', 0.3, 0.55); }
 };
 
@@ -161,6 +161,19 @@ function shake(el) {
   el.classList.remove('shake');
   void el.offsetWidth;
   el.classList.add('shake');
+}
+function elCenter(el) {
+  const r = el.getBoundingClientRect();
+  return [r.left + r.width / 2, r.top + r.height / 2];
+}
+function showCross(x, y) {
+  const c = document.createElement('div');
+  c.className = 'cross-mark';
+  c.textContent = '❌';
+  c.style.left = x + 'px';
+  c.style.top = y + 'px';
+  document.body.appendChild(c);
+  setTimeout(() => c.remove(), 900);
 }
 
 const CN_NUM = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
