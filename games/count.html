@@ -1,23 +1,23 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>數一數 | 數字樂園</title>
-<link rel="stylesheet" href="../css/style.css">
+<title>?訾???| ?詨?璅?</title>
+<link rel="stylesheet" href="../css/style.css?v=4?v=4">
 </head>
 <body>
 <div class="page">
   <div class="panel">
-    <div class="hint" id="hint">數一數有幾隻小魚？</div>
+    <div class="hint" id="hint">?訾??豢?撟暸撠?嚗?/div>
     <div class="fish-box" id="fishBox"></div>
     <div class="answer-row" id="ansRow"></div>
     <div class="feedback" id="fb"></div>
   </div>
 </div>
-<script src="../js/common.js"></script>
+<script src="../js/common.js?v=4?v=4"></script>
 <script>
-const INSTR = '數一數，有幾隻小魚？點下面的正確答案！也可以點小魚幫忙數唷。';
+const INSTR = '?訾??賂??嗾?餃?擳?暺??Ｙ?甇?Ⅱ蝑?嚗??臭誑暺?擳鼠敹?瑯?;
 let round = 0;
 const TOTAL = 10;
 let lastN = 0;
@@ -26,7 +26,7 @@ let locked = false;
 function buildFishes(n) {
   const box = document.getElementById('fishBox');
   box.innerHTML = '';
-  const kinds = ['🐠', '🐟', '🐡'];
+  const kinds = ['??', '??', '?'];
   for (let i = 0; i < n; i++) {
     const f = document.createElement('div');
     f.className = 'fish';
@@ -72,18 +72,18 @@ function choose(btn, v) {
       t.textContent = i + 1;
       t.style.display = 'flex';
     }, i * 180));
-    fb.textContent = '答對了！' + CN_NUM[n] + '隻小魚！';
+    fb.textContent = '蝑?鈭?' + CN_NUM[n] + '?餃?擳?';
     fb.className = 'feedback good';
-    Voice.speak('答對了！有' + CN_NUM[n] + '隻小魚，好棒！');
+    Voice.speak('蝑?鈭??? + CN_NUM[n] + '?餃?擳?憟賣?嚗?);
     confetti(24);
     setTimeout(next, 1800);
   } else {
     Sfx.bad();
     showCross(...elCenter(btn));
     shake(btn);
-    fb.textContent = '再數數看！';
+    fb.textContent = '??貊?嚗?;
     fb.className = 'feedback badf';
-    Voice.speak('再數數看！');
+    Voice.speak('??貊?嚗?);
     document.getElementById('fishBox') && shake(document.getElementById('fishBox'));
     setTimeout(() => {
       locked = false;
@@ -96,16 +96,16 @@ function next() {
   document.getElementById('fb').className = 'feedback';
   round++;
   if (round > TOTAL) {
-    showWin('你收集了 ' + starN + ' 顆星星！', start);
+    showWin('雿?? ' + starN + ' 憿???', start);
     return;
   }
   let n = randInt(1, 10);
   while (n === lastN) n = randInt(1, 10);
   lastN = n;
-  document.getElementById('hint').innerHTML = '第 ' + round + ' / ' + TOTAL + ' 題：數一數有幾隻小魚？';
+  document.getElementById('hint').innerHTML = '蝚?' + round + ' / ' + TOTAL + ' 憿??訾??豢?撟暸撠?嚗?;
   buildFishes(n);
   buildAnswers(n);
-  Voice.speak('數一數，有幾隻小魚？');
+  Voice.speak('?訾??賂??嗾?餃?擳?');
 }
 function start() {
   starN = 0;
@@ -118,7 +118,7 @@ function start() {
   document.getElementById('fb').className = 'feedback';
   next();
 }
-buildHeader('🐠 數一數', INSTR);
+buildHeader('?? ?訾???, INSTR);
 start();
 </script>
 </body>

@@ -1,24 +1,24 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>跳跳數數 | 數字樂園</title>
-<link rel="stylesheet" href="../css/style.css">
+<title>頝唾歲?豢 | ?詨?璅?</title>
+<link rel="stylesheet" href="../css/style.css?v=4?v=4">
 </head>
 <body>
 <div class="page">
   <div class="panel">
     <div class="hint" id="hint"></div>
     <div class="hop-track" id="track">
-      <div class="hop-frog" id="frog">🐸</div>
+      <div class="hop-frog" id="frog">?</div>
     </div>
     <div class="feedback" id="fb"></div>
   </div>
 </div>
-<script src="../js/common.js"></script>
+<script src="../js/common.js?v=4?v=4"></script>
 <script>
-const INSTR = '小青蛙要跳格子！照 1、2、3 的順序點數字，跳完十格就過關，一路跳到一百！';
+const INSTR = '撠???頝單摮???1???? ??摨??詨?嚗歲摰??澆停??嚗?頝航歲?唬??橘?';
 let level = 0;
 let next = 1;
 let base = 1;
@@ -41,11 +41,11 @@ function buildLevel() {
   });
   const frog = document.getElementById('frog');
   frog.style.left = '20px';
-  document.getElementById('hint').innerHTML = '第 ' + (level + 1) + ' / 10 關：照順序點 <span class="num">' + next + '</span>！';
+  document.getElementById('hint').innerHTML = '蝚?' + (level + 1) + ' / 10 ???折?摨? <span class="num">' + next + '</span>嚗?;
   const fb = document.getElementById('fb');
   fb.textContent = '';
   fb.className = 'feedback';
-  Voice.speak('我們從數字' + numToCN(base + 1) + '跳到' + numToCN(base + 10) + '！先點' + numToCN(base + 1) + '！');
+  Voice.speak('???詨?' + numToCN(base + 1) + '頝喳' + numToCN(base + 10) + '嚗?暺? + numToCN(base + 1) + '嚗?);
 }
 function clickStone(s, n, ev) {
   if (locked || s.classList.contains('done')) return;
@@ -56,9 +56,9 @@ function clickStone(s, n, ev) {
     void s.offsetWidth;
     s.classList.add('wiggle');
     const fb = document.getElementById('fb');
-    fb.textContent = '先點數字 ' + next + ' 喔！';
+    fb.textContent = '???詨? ' + next + ' ??';
     fb.className = 'feedback badf';
-    Voice.speak('下一個是' + numToCN(next) + '喔！');
+    Voice.speak('銝??' + numToCN(next) + '??');
     return;
   }
   Sfx.pop();
@@ -70,9 +70,9 @@ function clickStone(s, n, ev) {
   frog.classList.add('hop');
   addStar(1);
   const fb = document.getElementById('fb');
-  fb.textContent = '🐸 ' + numToCN(n) + '！';
+  fb.textContent = '? ' + numToCN(n) + '嚗?;
   fb.className = 'feedback good';
-  Voice.speak(numToCN(n) + '！');
+  Voice.speak(numToCN(n) + '嚗?);
   next++;
   if (next > base + 10) {
     locked = true;
@@ -81,14 +81,14 @@ function clickStone(s, n, ev) {
     setTimeout(() => {
       level++;
       if (level >= 10) {
-        showWin('你從一數到一百了！共 ' + starN + ' 顆星星！', start);
+        showWin('雿?銝?詨銝?曆?嚗 ' + starN + ' 憿???', start);
         return;
       }
-      Voice.speak('過關！我們已經數到' + numToCN(base + 10) + '了！');
+      Voice.speak('??嚗??歇蝬?? + numToCN(base + 10) + '鈭?');
       buildLevel();
     }, 2000);
   } else {
-    document.getElementById('hint').innerHTML = '第 ' + (level + 1) + ' / 10 關：照順序點 <span class="num">' + next + '</span>！';
+    document.getElementById('hint').innerHTML = '蝚?' + (level + 1) + ' / 10 ???折?摨? <span class="num">' + next + '</span>嚗?;
   }
 }
 function start() {
@@ -98,7 +98,7 @@ function start() {
   level = 0;
   buildLevel();
 }
-buildHeader('🐸 跳跳數數', INSTR);
+buildHeader('? 頝唾歲?豢', INSTR);
 start();
 </script>
 </body>

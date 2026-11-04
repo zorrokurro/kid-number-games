@@ -1,15 +1,15 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>比一比 | 數字樂園</title>
-<link rel="stylesheet" href="../css/style.css">
+<title>瘥?瘥?| ?詨?璅?</title>
+<link rel="stylesheet" href="../css/style.css?v=4?v=4">
 </head>
 <body>
 <div class="page">
   <div class="panel">
-    <div class="hint" id="hint">哪一邊比較多？點點看！</div>
+    <div class="hint" id="hint">?芯???頛?嚗?暺?嚗?/div>
     <div class="cmp-box">
       <div class="cmp-side cmp-left" id="left">
         <div class="cmp-num show" id="numL"></div>
@@ -23,9 +23,9 @@
     <div class="feedback" id="fb"></div>
   </div>
 </div>
-<script src="../js/common.js"></script>
+<script src="../js/common.js?v=4?v=4"></script>
 <script>
-const INSTR = '哪一邊比較多？點點看！答錯了沒關係，可以再試一次！';
+const INSTR = '?芯???頛?嚗?暺?嚗??臭?瘝?靽??臭誑?岫銝甈∴?';
 let round = 0;
 const TOTAL = 10;
 let leftN = 0, rightN = 0;
@@ -45,10 +45,10 @@ function newRound() {
   locked = false;
   round++;
   if (round > TOTAL) {
-    showWin('你收集了 ' + starN + ' 顆星星！', start);
+    showWin('雿?? ' + starN + ' 憿???', start);
     return;
   }
-  const fruit = pick(['🍎', '🍓', '🍊', '🍇', '🍌']);
+  const fruit = pick(['??', '??', '??', '??', '??']);
   do {
     leftN = randInt(1, 9);
     rightN = randInt(1, 9);
@@ -62,8 +62,8 @@ function newRound() {
   const fb = document.getElementById('fb');
   fb.textContent = '';
   fb.className = 'feedback';
-  document.getElementById('hint').innerHTML = '第 ' + round + ' / ' + TOTAL + ' 題：哪一邊<span style="color:#ff5f6f">比較多</span>？';
-  Voice.speak('哪一邊比較多？點點看！');
+  document.getElementById('hint').innerHTML = '蝚?' + round + ' / ' + TOTAL + ' 憿??芯???span style="color:#ff5f6f">瘥?憭?/span>嚗?;
+  Voice.speak('?芯???頛?嚗?暺?嚗?);
 }
 function choose(side, n, el) {
   if (locked) return;
@@ -74,9 +74,9 @@ function choose(side, n, el) {
     el.classList.add('cmp-ok');
     Sfx.good();
     addStar(1);
-    fb.textContent = '答對了！' + (side === 'left' ? '左邊' : '右邊') + '比較多！';
+    fb.textContent = '蝑?鈭?' + (side === 'left' ? '撌阡?' : '?喲?') + '瘥?憭?';
     fb.className = 'feedback good';
-    Voice.speak('答對了！' + (side === 'left' ? '左邊' : '右邊') + '比較多！');
+    Voice.speak('蝑?鈭?' + (side === 'left' ? '撌阡?' : '?喲?') + '瘥?憭?');
     confetti(24);
     setTimeout(newRound, 1800);
   } else {
@@ -84,9 +84,9 @@ function choose(side, n, el) {
     showCross(...elCenter(el));
     el.classList.add('cmp-bad');
     shake(el);
-    fb.textContent = '再想一想，可以再點一次！';
+    fb.textContent = '?銝?喉??臭誑??銝甈∴?';
     fb.className = 'feedback badf';
-    Voice.speak('比比看數字，哪個比較大？再試一次！');
+    Voice.speak('瘥??摮??芸?頛之嚗?閰虫?甈∴?');
     setTimeout(() => {
       el.classList.remove('cmp-bad');
     }, 900);
@@ -99,7 +99,7 @@ function start() {
   round = 0;
   newRound();
 }
-buildHeader('🍎 比一比', INSTR);
+buildHeader('?? 瘥?瘥?, INSTR);
 document.getElementById('left').addEventListener('click', () => choose('left', leftN, document.getElementById('left')));
 document.getElementById('right').addEventListener('click', () => choose('right', rightN, document.getElementById('right')));
 start();
