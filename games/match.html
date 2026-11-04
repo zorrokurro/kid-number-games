@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>閮?? | ?詨?璅?</title>
-<link rel="stylesheet" href="../css/style.css?v=4?v=4">
+<title>記憶配對 | 數字樂園</title>
+<link rel="stylesheet" href="../css/style.css?v=4">
 </head>
 <body>
 <div class="page">
@@ -16,17 +16,17 @@
 </div>
 <div class="pick-mask" id="pickMask">
   <div class="win-card" style="font-size: 26px;">
-    <div class="big">??</div>
-    <div>?喟?芯?蝯?</div>
+    <div class="big">🃏</div>
+    <div>想玩哪一組？</div>
     <div class="row">
-      <button class="btn green" data-m="1">? 蝪∪嚗? 撠?1~5嚗?/button>
-      <button class="btn purple" data-m="2">? ?脤?嚗? 撠?1~10嚗?/button>
+      <button class="btn green" data-m="1">🌱 簡單（3 對，1~5）</button>
+      <button class="btn purple" data-m="2">🔥 進階（4 對，1~10）</button>
     </div>
   </div>
 </div>
-<script src="../js/common.js?v=4?v=4"></script>
+<script src="../js/common.js?v=4"></script>
 <script>
-const INSTR = '蝧餌蕃?∠?嚗?箸摮?暺?銝璅???銝撠?';
+const INSTR = '翻翻卡片，找出數字和點點一樣多的那一對！';
 let mode = 1;
 let boards = 0;
 const BOARDS_TOTAL = 3;
@@ -80,7 +80,7 @@ function mkCard(kind, num) {
   inner.className = 'card-in';
   const cover = document.createElement('div');
   cover.className = 'face cover';
-  cover.textContent = '??;
+  cover.textContent = '❓';
   const front = document.createElement('div');
   front.className = 'face front';
   if (kind === 'num') {
@@ -120,9 +120,9 @@ function flip(c, kind, num) {
       a.c.classList.remove('open');
       b.c.classList.remove('open');
       const fb = document.getElementById('fb');
-      fb.textContent = '??????嚗?;
+      fb.textContent = '✨ 配對成功！';
       fb.className = 'feedback good';
-      Voice.speak('????嚗?);
+      Voice.speak('配對成功！');
       openCards = [];
       lock = false;
       const pairTotal = mode === 1 ? 3 : 4;
@@ -135,7 +135,7 @@ function flip(c, kind, num) {
       Sfx.bad();
       showCross(...elCenter(b.c));
       if (a.kind === b.kind && a.num === b.num) {
-        Voice.speak('閬?撘菜摮?撘菟?暺?嚗?);
+        Voice.speak('要一張數字、一張點點喔！');
       }
       setTimeout(() => {
         a.c.classList.remove('open');
@@ -162,11 +162,11 @@ function buildBoard(nums) {
 function nextBoard() {
   boards++;
   if (boards >= BOARDS_TOTAL) {
-    showWin('???券摰?嚗 ' + starN + ' 憿???', showPicker);
+    showWin('配對全部完成！共 ' + starN + ' 顆星星！', showPicker);
     return;
   }
-  document.getElementById('hint').textContent = '蝚?' + (boards + 1) + ' 獢??硃嚗?;
-  Voice.speak('憟賣?嚗?靘?獢?');
+  document.getElementById('hint').textContent = '第 ' + (boards + 1) + ' 桌！加油！';
+  Voice.speak('好棒！再來一桌！');
   buildBoard(pickNums());
 }
 function showPicker() {
@@ -179,7 +179,7 @@ function showPicker() {
   document.getElementById('grid').innerHTML = '';
   document.getElementById('fb').textContent = '';
   document.getElementById('fb').className = 'feedback';
-  document.getElementById('hint').innerHTML = '? ?訾?蝯?憪嚗??;
+  document.getElementById('hint').innerHTML = '🎭 選一組開始吧！🔊';
   document.getElementById('pickMask').classList.add('show');
 }
 document.querySelectorAll('#pickMask button').forEach(btn => {
@@ -189,12 +189,12 @@ document.querySelectorAll('#pickMask button').forEach(btn => {
     lock = false;
     document.getElementById('pickMask').classList.remove('show');
     Sfx.click();
-    document.getElementById('hint').textContent = '蝧餌蕃?∠?嚗??詨???璅????暺?撠?';
+    document.getElementById('hint').textContent = '翻翻卡片，把數字和一樣多的點點配對！';
     buildBoard(pickNums());
-    Voice.speak('蝧餌蕃?∠?嚗?箸摮?暺?銝璅???銝撠?');
+    Voice.speak('翻翻卡片，找出數字和點點一樣多的那一對！');
   });
 });
-buildHeader('?? 閮??', INSTR);
+buildHeader('🃏 記憶配對', INSTR);
 showPicker();
 </script>
 </body>

@@ -1,33 +1,33 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>暺除??| ?詨?璅?</title>
-<link rel="stylesheet" href="../css/style.css?v=4?v=4">
+<title>點氣球 | 數字樂園</title>
+<link rel="stylesheet" href="../css/style.css?v=4">
 </head>
 <body>
 <div class="page">
   <div class="panel">
     <div class="hint" id="hint"></div>
-    <button class="btn orange icon" id="pickBtn">? ?瘜?/button>
+    <button class="btn orange icon" id="pickBtn">🎭 換玩法</button>
     <div class="sky" id="sky"></div>
     <div class="feedback" id="fb"></div>
   </div>
 </div>
 <div class="pick-mask" id="pickMask">
   <div class="win-card" style="font-size: 26px;">
-    <div class="big">?</div>
-    <div>?喟?芯?蝔殷?</div>
+    <div class="big">🎭</div>
+    <div>想玩哪一種？</div>
     <div class="row">
-      <button class="btn pink" data-m="1">?? ?摮?8 憿?</button>
-      <button class="btn green" data-m="2">? ???摮?10 憿?</button>
+      <button class="btn pink" data-m="1">🔁 換數字（8 顆）</button>
+      <button class="btn green" data-m="2">🎯 同一個數字（10 顆）</button>
     </div>
   </div>
 </div>
-<script src="../js/common.js?v=4?v=4"></script>
+<script src="../js/common.js?v=4"></script>
 <script>
-const INSTR = '?訾??瘜??摮芋撘???銝?摮之?嚗?;
+const INSTR = '選一個玩法：換數字模式，或同一個數字大挑戰！';
 let target = 0;
 let score = 0;
 let goal = 8;
@@ -42,10 +42,10 @@ function setTarget() {
   while (n === target) n = randInt(1, 10);
   target = n;
   const h = document.getElementById('hint');
-  h.innerHTML = '暺??詨? <span class="num">' + target + '</span> ?除?? ??';
+  h.innerHTML = '點爆數字 <span class="num">' + target + '</span> 的氣球！ 🔊';
   h.style.cursor = 'pointer';
-  h.onclick = () => Voice.speak('暺??詨? ' + CN_NUM[target] + ' ?除??');
-  Voice.speak('暺??詨? ' + CN_NUM[target] + ' ?除??');
+  h.onclick = () => Voice.speak('點爆數字 ' + CN_NUM[target] + ' 的氣球！');
+  Voice.speak('點爆數字 ' + CN_NUM[target] + ' 的氣球！');
 }
 function spawn(forceTarget) {
   const sky = document.getElementById('sky');
@@ -96,10 +96,10 @@ function popBalloon(b, e) {
       locked = true;
       clearInterval(spawnTimer);
       sky.querySelectorAll('.balloon').forEach(el => el.remove());
-      setTimeout(() => showWin('暺?鈭?' + goal + ' 憿除????' + starN + ' 憿???', startLevel), 700);
+      setTimeout(() => showWin('點爆了 ' + goal + ' 顆氣球！共 ' + starN + ' 顆星星！', startLevel), 700);
       return;
     }
-    fb.textContent = '???堆?蝑?鈭?';
+    fb.textContent = '✨ 砰！答對了！';
     fb.className = 'feedback good';
     if (mode === 1) {
       const id2 = levelId;
@@ -116,15 +116,15 @@ function popBalloon(b, e) {
     void b.offsetWidth;
     b.classList.add('wiggle');
     const fb = document.getElementById('fb');
-    if (fb) { fb.textContent = '?餅?詨? ' + target + ' ?除??'; fb.className = 'feedback badf'; }
-    Voice.speak('?曆??橘??詨? ' + CN_NUM[target] + ' ?除??');
+    if (fb) { fb.textContent = '去找數字 ' + target + ' 的氣球！'; fb.className = 'feedback badf'; }
+    Voice.speak('找一找，數字 ' + CN_NUM[target] + ' 的氣球！');
   }
   setTimeout(() => b.remove(), 250);
 }
 function updateHint() {
   const h = document.getElementById('hint');
   if (mode === 2) {
-    h.innerHTML = '??暺??詨? <span class="num">' + target + '</span> ?除??<span class="num">' + score + ' / ' + goal + '</span>嚗?;
+    h.innerHTML = '這關點爆數字 <span class="num">' + target + '</span> 的氣球：<span class="num">' + score + ' / ' + goal + '</span>！';
   }
 }
 function startLevel() {
@@ -142,7 +142,7 @@ function startLevel() {
   } else {
     target = randInt(1, 10);
     updateHint();
-    Voice.speak('???摮' + CN_NUM[target] + '嚗?甈⊿?銝憿?暺?' + CN_NUM[goal] + '憿停??嚗?);
+    Voice.speak('這關的數字是' + CN_NUM[target] + '，一次點一顆，點爆' + CN_NUM[goal] + '顆就過關！');
   }
   spawn(true);
   spawnTimer = setInterval(() => {
@@ -166,7 +166,7 @@ function buildPicker() {
     });
   });
 }
-buildHeader('?? 暺除??, INSTR);
+buildHeader('🎈 點氣球', INSTR);
 buildPicker();
 mode = 1;
 goal = 8;

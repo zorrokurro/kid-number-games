@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>?豢瘞?? | ?詨?璅?</title>
-<link rel="stylesheet" href="../css/style.css?v=4?v=4">
+<title>數數氣球 | 數字樂園</title>
+<link rel="stylesheet" href="../css/style.css?v=4">
 </head>
 <body>
 <div class="page">
@@ -17,9 +17,9 @@
     <div class="feedback" id="fb"></div>
   </div>
 </div>
-<script src="../js/common.js?v=4?v=4"></script>
+<script src="../js/common.js?v=4"></script>
 <script>
-const INSTR = '??1???? ??摨??除??憭扯頝??賂?';
+const INSTR = '照 1、2、3 的順序點爆氣球，大聲跟著數！';
 const ROUNDS = [5, 6, 7, 8, 9, 10];
 let roundIdx = 0;
 let next = 1;
@@ -45,11 +45,11 @@ function buildRound(n) {
   const fb = document.getElementById('fb');
   fb.textContent = '';
   fb.className = 'feedback';
-  Voice.speak('???詨' + CN_NUM[n] + '嚗?暺摮?嚗?);
+  Voice.speak('我們來數到' + CN_NUM[n] + '！先點數字一！');
 }
 function updateHint() {
   document.getElementById('hint').innerHTML =
-    '蝚?' + (roundIdx + 1) + ' / ' + ROUNDS.length + ' 頛迎??折?摨? <span class="num">' + next + '</span> 嚗歇?詨 ' + (next - 1) + '嚗?;
+    '第 ' + (roundIdx + 1) + ' / ' + ROUNDS.length + ' 輪：照順序點 <span class="num">' + next + '</span> （已數到 ' + (next - 1) + '）';
 }
 function clickB(b, num) {
   if (locked || b.classList.contains('popped')) return;
@@ -60,17 +60,17 @@ function clickB(b, num) {
     void b.offsetWidth;
     b.classList.add('wiggle');
     const fb = document.getElementById('fb');
-    fb.textContent = '???詨? ' + next + ' ?除??';
+    fb.textContent = '先點數字 ' + next + ' 的氣球！';
     fb.className = 'feedback badf';
-    Voice.speak('???詨?' + CN_NUM[next] + '?除??');
+    Voice.speak('先點數字' + CN_NUM[next] + '的氣球！');
     return;
   }
   Sfx.pop();
   b.classList.add('popped');
   const fb = document.getElementById('fb');
-  fb.textContent = '??' + CN_NUM[num] + '嚗撠?嚗?;
+  fb.textContent = '✨ ' + CN_NUM[num] + '！數對了！';
   fb.className = 'feedback good';
-  Voice.speak(CN_NUM[num] + '嚗?);
+  Voice.speak(CN_NUM[num] + '！');
   addStar(1);
   burst.call(null, ...pos(b));
   total = num;
@@ -82,10 +82,10 @@ function clickB(b, num) {
       locked = false;
       roundIdx++;
       if (roundIdx >= ROUNDS.length) {
-        showWin('雿??詨??嚗 ' + starN + ' 憿???', start);
+        showWin('你會數到十了！共 ' + starN + ' 顆星星！', start);
         return;
       }
-      Voice.speak(CN_NUM[ROUNDS[roundIdx - 1]] + '?除??憟賣?嚗?銝頛迎?');
+      Voice.speak(CN_NUM[ROUNDS[roundIdx - 1]] + '個氣球，好棒！下一輪！');
       buildRound(ROUNDS[roundIdx]);
     }, 1800);
   } else {
@@ -105,7 +105,7 @@ function start() {
   locked = false;
   buildRound(ROUNDS[0]);
 }
-buildHeader('?? ?豢瘞??', INSTR);
+buildHeader('🎈 數數氣球', INSTR);
 start();
 </script>
 </body>
