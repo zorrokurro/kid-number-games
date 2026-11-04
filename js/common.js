@@ -177,3 +177,13 @@ function showCross(x, y) {
 }
 
 const CN_NUM = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
+const BCOLORS = ['#ff5f6f', '#54a7ff', '#43d19e', '#ffc63c', '#b06ef7', '#ff9d54'];
+
+function numToCN(n) {
+  if (n <= 10) return CN_NUM[n];
+  if (n === 100) return '一百';
+  if (n < 20) return '十' + CN_NUM[n - 10];
+  const t = Math.floor(n / 10);
+  const o = n % 10;
+  return CN_NUM[t] + '十' + (o ? CN_NUM[o] : '');
+}

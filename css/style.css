@@ -237,6 +237,52 @@ body::after {
   padding: 58px 14px 14px;
   min-height: 240px;
 }
+.hop-track {
+  position: relative;
+  min-height: 190px;
+  background: #f2fbff;
+  border: 4px dashed #bfe6ff;
+  border-radius: 24px;
+  padding: 74px 14px 18px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 12px;
+}
+.hop-frog {
+  position: absolute;
+  top: 8px;
+  left: 20px;
+  font-size: 52px;
+  transition: left .38s ease-in-out;
+  z-index: 2;
+  filter: drop-shadow(0 4px 4px rgba(0,0,0,.18));
+}
+.hop-frog.hop { animation: froghop .38s ease; }
+@keyframes froghop {
+  40% { transform: translateY(-26px) scale(1.05); }
+  100% { transform: translateY(0); }
+}
+.hop-stone {
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  border: 4px solid #fff;
+  background: #ffd24d;
+  color: #5a4b8a;
+  font-family: inherit;
+  font-size: 26px;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 5px 0 rgba(0,0,0,.12);
+  transition: transform .12s;
+}
+.hop-stone:hover { transform: scale(1.1); }
+.hop-stone.done {
+  background: #43d19e;
+  color: #fff;
+  box-shadow: 0 5px 0 #2c9b72;
+}
 
 /* ===== count game ===== */
 .fish-box {

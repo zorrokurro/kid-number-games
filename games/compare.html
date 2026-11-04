@@ -12,11 +12,11 @@
     <div class="hint" id="hint">哪一邊比較多？點點看！</div>
     <div class="cmp-box">
       <div class="cmp-side cmp-left" id="left">
-        <div class="cmp-num" id="numL"></div>
+        <div class="cmp-num show" id="numL"></div>
         <div class="cmp-items" id="leftItems"></div>
       </div>
       <div class="cmp-side cmp-right" id="right">
-        <div class="cmp-num" id="numR"></div>
+        <div class="cmp-num show" id="numR"></div>
         <div class="cmp-items" id="rightItems"></div>
       </div>
     </div>
@@ -25,10 +25,10 @@
 </div>
 <script src="../js/common.js"></script>
 <script>
-const INSTR = '比一比，點點看哪一邊比較多！答完會告訴你兩邊各有幾個！';
+const INSTR = '哪一邊比較多？點點看！答錯了沒關係，可以再試一次！';
 let round = 0;
 const TOTAL = 10;
-let leftN = 0, rightN = 0, mode = 'more';
+let leftN = 0, rightN = 0;
 let locked = false;
 
 function fillSide(box, n, fruit) {
@@ -49,7 +49,6 @@ function newRound() {
     return;
   }
   const fruit = pick(['🍎', '🍓', '🍊', '🍇', '🍌']);
-  mode = Math.random() < 0.35 ? 'less' : 'more';
   do {
     leftN = randInt(1, 9);
     rightN = randInt(1, 9);
@@ -58,53 +57,40 @@ function newRound() {
   fillSide(document.getElementById('rightItems'), rightN, fruit);
   document.getElementById('left').className = 'cmp-side cmp-left';
   document.getElementById('right').className = 'cmp-side cmp-right';
-  const numL = document.getElementById('numL');
-  const numR = document.getElementById('numR');
-  numL.classList.remove('show');
-  numR.classList.remove('show');
+  document.getElementById('numL').textContent = leftN;
+  document.getElementById('numR').textContent = rightN;
   const fb = document.getElementById('fb');
   fb.textContent = '';
   fb.className = 'feedback';
-  const h = document.getElementById('hint');
-  if (mode === 'more') {
-    h.innerHTML = '第 ' + round + ' / ' + TOTAL + ' 題：哪一邊<span style="color:#ff5f6f">比較多</span>？';
-    Voice.speak('哪一邊比較多？點點看！');
-  } else {
-    h.innerHTML = '第 ' + round + ' / ' + TOTAL + ' 題：哪一邊<span style="color:#54a7ff">比較少</span>？';
-    Voice.speak('哪一邊比較少？點點看！');
-  }
+  document.getElementById('hint').innerHTML = '第 ' + round + ' / ' + TOTAL + ' 題：哪一邊<span style="color:#ff5f6f">比較多</span>？';
+  Voice.speak('哪一邊比較多？點點看！');
 }
 function choose(side, n, el) {
   if (locked) return;
-  locked = true;
   const other = side === 'left' ? rightN : leftN;
-  const ok = mode === 'more' ? n > other : n < other;
   const fb = document.getElementById('fb');
-  const numL = document.getElementById('numL');
-  const numR = document.getElementById('numR');
-  numL.textContent = leftN;
-  numR.textContent = rightN;
-  numL.classList.add('show');
-  numR.classList.add('show');
-  if (ok) {
+  if (n > other) {
+    locked = true;
     el.classList.add('cmp-ok');
     Sfx.good();
     addStar(1);
-    const word = mode === 'more' ? '多' : '少';
-    fb.textContent = '答對了！' + (side === 'left' ? '左邊' : '右邊') + '比較' + word + '！';
+    fb.textContent = '答對了！' + (side === 'left' ? '左邊' : '右邊') + '比較多！';
     fb.className = 'feedback good';
-    Voice.speak('答對了！' + (side === 'left' ? '左邊' : '右邊') + '比較' + word + '！');
+    Voice.speak('答對了！' + (side === 'left' ? '左邊' : '右邊') + '比較多！');
     confetti(24);
+    setTimeout(newRound, 1800);
   } else {
     Sfx.bad();
     showCross(...elCenter(el));
     el.classList.add('cmp-bad');
     shake(el);
-    fb.textContent = '再想一想！數一數水果！';
+    fb.textContent = '再想一想，可以再點一次！';
     fb.className = 'feedback badf';
-    Voice.speak('再數一數，想一想！');
+    Voice.speak('比比看數字，哪個比較大？再試一次！');
+    setTimeout(() => {
+      el.classList.remove('cmp-bad');
+    }, 900);
   }
-  setTimeout(newRound, ok ? 1800 : 2200);
 }
 function start() {
   starN = 0;

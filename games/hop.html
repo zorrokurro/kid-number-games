@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>跳跳數數 | 數字樂園</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<div class="page">
+  <div class="panel">
+    <div class="hint" id="hint"></div>
+    <div class="hop-track" id="track">
+      <div class="hop-frog" id="frog">🐸</div>
+    </div>
+    <div class="feedback" id="fb"></div>
+  </div>
+</div>
+<script src="../js/common.js"></script>
+<script>
+const INSTR = '小青蛙要跳格子！照 1、2、3 的順序點數字，跳完十格就過關，一路跳到一百！';
+let level = 0;
+let next = 1;
+let base = 1;
+let locked = false;
+
+function buildLevel() {
+  next = 1;
+  base = level * 10;
+  locked = false;
+  const track = document.getElementById('track');
+  track.querySelectorAll('.hop-stone').forEach(s => s.remove());
+  const nums = shuffle(Array.from({ length: 10 }, (_, i) => base + i + 1));
+  nums.forEach(n => {
+    const s = document.createElement('button');
+    s.className = 'hop-stone';
+    s.textContent = n;
+    s.dataset.n = n;
+    s.addEventListener('click', ev => clickStone(s, n, ev));
+    track.appendChild(s);
+  });
+  const frog = document.getElementById('frog');
+  frog.style.left = '20px';
+  document.getElementById('hint').innerHTML = '第 ' + (level + 1) + ' / 10 關：照順序點 <span class="num">' + next + '</span>！';
+  const fb = document.getElementById('fb');
+  fb.textContent = '';
+  fb.className = 'feedback';
+  Voice.speak('我們從數字' + numToCN(base + 1) + '跳到' + numToCN(base + 10) + '！先點' + numToCN(base + 1) + '！');
+}
+function clickStone(s, n, ev) {
+  if (locked || s.classList.contains('done')) return;
+  if (n !== next) {
+    Sfx.bad();
+    showCross(ev.clientX, ev.clientY);
+    s.classList.remove('wiggle');
+    void s.offsetWidth;
+    s.classList.add('wiggle');
+    const fb = document.getElementById('fb');
+    fb.textContent = '先點數字 ' + next + ' 喔！';
+    fb.className = 'feedback badf';
+    Voice.speak('下一個是' + numToCN(next) + '喔！');
+    return;
+  }
+  Sfx.pop();
+  s.classList.add('done');
+  const frog = document.getElementById('frog');
+  frog.style.left = (s.offsetLeft + s.offsetWidth / 2 - 26) + 'px';
+  frog.classList.remove('hop');
+  void frog.offsetWidth;
+  frog.classList.add('hop');
+  addStar(1);
+  const fb = document.getElementById('fb');
+  fb.textContent = '🐸 ' + numToCN(n) + '！';
+  fb.className = 'feedback good';
+  Voice.speak(numToCN(n) + '！');
+  next++;
+  if (next > base + 10) {
+    locked = true;
+    confetti(40);
+    Sfx.good();
+    setTimeout(() => {
+      level++;
+      if (level >= 10) {
+        showWin('你從一數到一百了！共 ' + starN + ' 顆星星！', start);
+        return;
+      }
+      Voice.speak('過關！我們已經數到' + numToCN(base + 10) + '了！');
+      buildLevel();
+    }, 2000);
+  } else {
+    document.getElementById('hint').innerHTML = '第 ' + (level + 1) + ' / 10 關：照順序點 <span class="num">' + next + '</span>！';
+  }
+}
+function start() {
+  starN = 0;
+  const e = document.getElementById('starN');
+  if (e) e.textContent = '0';
+  level = 0;
+  buildLevel();
+}
+buildHeader('🐸 跳跳數數', INSTR);
+start();
+</script>
+</body>
+</html>
