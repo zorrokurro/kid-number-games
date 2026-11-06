@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>收蔬菜 | 數字樂園</title>
+<link rel="stylesheet" href="../css/style.css?v=6">
+</head>
+<body>
+<div class="page">
+  <div class="panel">
+    <div class="hint" id="hint"></div>
+    <div class="field" id="field"></div>
+    <div class="basket-zone">
+      <div class="basket" id="basket">🧺</div>
+      <div class="basket-strip" id="strip"></div>
+    </div>
+    <div class="answer-row" id="ansRow" style="display:none"></div>
+    <div class="feedback" id="fb"></div>
+  </div>
+</div>
+<script src="../js/common.js?v=6"></script>
+<script>
+const INSTR = '把菜園裡的蔬菜全部採收起來！一邊採一邊大聲數，再告訴農夫一共採了幾個！';
+const VEG = [['紅蘿蔔', '🥕'], ['番茄', '🍅'], ['玉米', '🌽'], ['茄子', '🍆'], ['馬鈴薯', '🥔'], ['草莓', '🍓']];
+let round = 0;
+const TOTAL = 8;
+let targetN = 0, vegName = '', picked = 0, locked = false;
+
+function newRound() {
+  locked = false;
+  picked = 0;
+  round++;
+  if (round > TOTAL) {
+    showWin('豐收囉！你收集了 ' + starN + ' 顆星星！', start);
+    return;
+  }
+  const kind = pick(VEG);
+  vegName = kind[0];
+  const emoji = kind[1];
+  targetN = randInt(4, 9);
+  document.getElementById('strip').innerHTML = '';
+  document.getElementById('ansRow').style.display = 'none';
+  document.getElementById('ansRow').innerHTML = '';
+  const field = document.getElementById('field');
+  field.innerHTML = '';
+  for (let i = 0; i < targetN; i++) {
+    const c = document.createElement('button');
+    c.className = 'crop';
+    c.textContent = emoji;
+    c.style.left = randInt(6, 90) + '%';
+    c.style.top = randInt(8, 68) + '%';
+    c.style.transform = 'translate(-50%,-50%) rotate(' + randInt(-15, 15) + 'deg)';
+    c.addEventListener('click', ev => pickCrop(c, ev));
+    field.appendChild(c);
+  }
+  document.getElementById('hint').innerHTML = '第 ' + round + ' / ' + TOTAL + ' 題：把菜園裡的' + vegName + '全部<span style="color:#2c9b72">採收</span>起來！';
+  const fb = document.getElementById('fb');
+  fb.textContent = '';
+  fb.className = 'feedback';
+  Voice.speak('菜園裡長滿了' + vegName + '！把它們全部採收，一邊採一邊大聲數！');
+}
+function pickCrop(c, ev) {
+  if (locked || c.classList.contains('boomf')) return;
+  picked++;
+  Sfx.pop();
+  showCrosslessBurst(ev);
+  c.classList.add('boomf');
+  setTimeout(() => c.remove(), 260);
+  const strip = document.getElementById('strip');
+  const s = document.createElement('span');
+  s.className = 'strip-c';
+  s.innerHTML = c.textContent + '<b>' + picked + '</b>';
+  strip.appendChild(s);
+  Voice.speak(numToCN(picked));
+  if (picked >= targetN) {
+    locked = true;
+    setTimeout(() => {
+      const row = document.getElementById('ansRow');
+      row.innerHTML = '';
+      shuffle([targetN, ...wrongNums(targetN, 1, 10, 2)]).forEach(v => {
+        const b = document.createElement('button');
+        b.className = 'num-btn nb' + (row.children.length + 1);
+        b.innerHTML = v + '<small>' + numToCN(v) + '</small>';
+        b.addEventListener('click', () => choose(b, v));
+        row.appendChild(b);
+      });
+      row.style.display = 'flex';
+      document.getElementById('hint').innerHTML = '我們一共採了幾個' + vegName + '？點下面的答案！';
+      Voice.speak('我們一共採了幾個' + vegName + '呢？點下面的答案！');
+    }, 700);
+  }
+}
+function showCrosslessBurst(ev) {
+  burst(ev.clientX || 0, ev.clientY || 0);
+}
+function choose(btn, v) {
+  if (locked) return;
+  locked = true;
+  const fb = document.getElementById('fb');
+  if (v === targetN) {
+    btn.classList.add('ok');
+    Sfx.good();
+    addStar(1);
+    confetti(26);
+    document.getElementById('basket').classList.add('happy');
+    fb.textContent = '答對了！一共採了 ' + targetN + ' 個' + vegName + '！';
+    fb.className = 'feedback good';
+    Voice.speak('答對了！一共採了' + numToCN(targetN) + '個' + vegName + '，豐收囉！');
+    setTimeout(newRound, 2300);
+  } else {
+    Sfx.bad();
+    showCross(...elCenter(btn));
+    shake(btn);
+    fb.textContent = '再數一數籃子裡的蔬菜！';
+    fb.className = 'feedback badf';
+    Voice.speak('再數一數籃子裡的蔬菜！');
+    setTimeout(() => { locked = false; }, 500);
+  }
+}
+function start() {
+  starN = 0;
+  const e = document.getElementById('starN');
+  if (e) e.textContent = '0';
+  round = 0;
+  locked = false;
+  newRound();
+}
+buildHeader('🥕 收蔬菜', INSTR);
+start();
+</script>
+</body>
+</html>

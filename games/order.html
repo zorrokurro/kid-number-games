@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>數字排排隊 | 數字樂園</title>
+<link rel="stylesheet" href="../css/style.css?v=6">
+</head>
+<body>
+<div class="page">
+  <div class="pick" id="modePick">
+    <button class="btn green" id="m1">🌱 排 1~5</button>
+    <button class="btn purple" id="m2">🌳 1~10 挑戰</button>
+  </div>
+  <div class="panel">
+    <div class="hint" id="hint"></div>
+    <div class="train-zone">
+      <div class="train" id="train"></div>
+    </div>
+    <div class="answer-row" id="ansRow"></div>
+    <div class="feedback" id="fb"></div>
+  </div>
+</div>
+<script src="../js/common.js?v=6"></script>
+<script>
+const INSTR = '小火車少了一節車廂！看看車廂上的數字，找出缺少的那一個！';
+let mode = 1;
+let round = 0;
+const TOTAL = 8;
+let missVal = 0, missIdx = 0, seq = [], locked = false;
+
+function newRound() {
+  locked = false;
+  round++;
+  if (round > TOTAL) {
+    showWin('小火車全部修好了！共 ' + starN + ' 顆星星！', start);
+    return;
+  }
+  const lo = 1;
+  const hi = mode === 1 ? 5 : 10;
+  const startN = mode === 1 ? 1 : randInt(1, 6);
+  seq = [startN, startN + 1, startN + 2, startN + 3, startN + 4];
+  missIdx = randInt(0, 4);
+  missVal = seq[missIdx];
+  const train = document.getElementById('train');
+  train.classList.remove('drive');
+  train.innerHTML = '<span class="engine">🚂</span>';
+  seq.forEach((v, i) => {
+    const c = document.createElement('div');
+    if (i === missIdx) {
+      c.className = 'tcar slot';
+      c.textContent = '?';
+      c.dataset.slot = '1';
+    } else {
+      c.className = 'tcar';
+      c.textContent = v;
+    }
+    train.appendChild(c);
+  });
+  const row = document.getElementById('ansRow');
+  row.innerHTML = '';
+  shuffle([missVal, ...wrongNums(missVal, lo, hi, 2)]).forEach(v => {
+    const b = document.createElement('button');
+    b.className = 'num-btn nb' + (row.children.length + 1);
+    b.innerHTML = v + '<small>' + numToCN(v) + '</small>';
+    b.addEventListener('click', () => choose(b, v));
+    row.appendChild(b);
+  });
+  const q = seq.map((v, i) => i === missIdx ? '<span class="q">？</span>' : v).join('、');
+  document.getElementById('hint').innerHTML = '第 ' + round + ' / ' + TOTAL + ' 題：<span class="seq">' + q + '</span>，缺哪個數字？';
+  const fb = document.getElementById('fb');
+  fb.textContent = '';
+  fb.className = 'feedback';
+  Voice.speak('小火車少了一個數字，是哪一個呢？');
+}
+function choose(btn, v) {
+  if (locked) return;
+  locked = true;
+  const fb = document.getElementById('fb');
+  const slot = document.querySelector('#train .tcar.slot');
+  if (v === missVal && slot) {
+    slot.textContent = missVal;
+    slot.classList.remove('slot');
+    slot.classList.add('filled');
+    Sfx.good();
+    addStar(1);
+    confetti(26);
+    document.querySelectorAll('#train .tcar').forEach((c, i) => setTimeout(() => c.classList.add('bnc'), i * 110));
+    fb.textContent = '答對了！是 ' + missVal + '！小火車開動囉～';
+    fb.className = 'feedback good';
+    Voice.speak('答對了！是' + numToCN(missVal) + '！小火車開動囉！');
+    setTimeout(() => { document.getElementById('train').classList.add('drive'); }, 900);
+    setTimeout(newRound, 2600);
+  } else {
+    Sfx.bad();
+    showCross(...elCenter(btn));
+    shake(btn);
+    fb.textContent = '再想一想，哪個數字不見了？';
+    fb.className = 'feedback badf';
+    Voice.speak('再想一想，哪個數字不見了？');
+    setTimeout(() => { locked = false; }, 500);
+  }
+}
+function start() {
+  starN = 0;
+  const e = document.getElementById('starN');
+  if (e) e.textContent = '0';
+  round = 0;
+  locked = false;
+  newRound();
+}
+document.getElementById('m1').addEventListener('click', () => { Sfx.click(); mode = 1; document.getElementById('modePick').classList.add('hide'); start(); });
+document.getElementById('m2').addEventListener('click', () => { Sfx.click(); mode = 2; document.getElementById('modePick').classList.add('hide'); start(); });
+buildHeader('🚂 數字排排隊', INSTR);
+</script>
+</body>
+</html>

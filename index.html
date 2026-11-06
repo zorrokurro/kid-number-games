@@ -4,13 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>數字樂園 | 小朋友數學遊戲</title>
-<link rel="stylesheet" href="css/style.css?v=5">
+<link rel="stylesheet" href="css/style.css?v=6">
 </head>
 <body>
 <div class="page">
   <div class="lobby-hero">
     <h1>🔢 數字樂園</h1>
-    <p>歡迎來玩 7 個有趣的數字遊戲！點點卡片開始吧！</p>
+    <p>歡迎來玩 12 個有趣的數字遊戲！點點卡片開始吧！</p>
     <div class="lobby-stars">⭐ <span>收集到的星星：</span><b id="totalStars">0</b> <span>顆</span></div>
   </div>
   <div class="game-grid">
@@ -49,10 +49,35 @@
       <div class="name">跳跳數數</div>
       <div class="desc">照順序點數字，從 1 數到 100！</div>
     </a>
+    <a class="game-card card-c5" href="games/feed.html" data-say="餵熊熊，點餅乾餵熊熊吃，一邊餵一邊大聲數！">
+      <span class="ico">🐻</span>
+      <div class="name">餵熊熊</div>
+      <div class="desc">點餅乾餵熊熊，一邊餵一邊數！</div>
+    </a>
+    <a class="game-card card-c7" href="games/treasure.html" data-say="海底尋寶，數一數海洋生物，點開答案寶盒！">
+      <span class="ico">🎁</span>
+      <div class="name">海底尋寶</div>
+      <div class="desc">數一數海洋生物，打開寶盒！</div>
+    </a>
+    <a class="game-card card-c8" href="games/ladybug.html" data-say="瓢蟲點點，找一找哪隻瓢蟲有這麼多點點！">
+      <span class="ico">🐞</span>
+      <div class="name">瓢蟲點點</div>
+      <div class="desc">哪隻瓢蟲的點點一樣多？</div>
+    </a>
+    <a class="game-card card-c9" href="games/order.html" data-say="數字排排隊，小火車少了一個數字，快幫忙找出來！">
+      <span class="ico">🚂</span>
+      <div class="name">數字排排隊</div>
+      <div class="desc">小火車少了一個數字，找出來！</div>
+    </a>
+    <a class="game-card card-c10" href="games/harvest.html" data-say="收蔬菜，把蔬菜採收起來，一邊採一邊數！">
+      <span class="ico">🥕</span>
+      <div class="name">收蔬菜</div>
+      <div class="desc">採收蔬菜，一邊採一邊數！</div>
+    </a>
   </div>
   <p class="lobby-tip">🌈 玩遊戲收集星星，變成數字小達人！</p>
 </div>
-<script src="js/common.js?v=5"></script>
+<script src="js/common.js?v=6"></script>
 <script>
 document.getElementById('totalStars').textContent = localStorage.getItem('kid_stars') || '0';
 document.querySelectorAll('.game-card').forEach(c => {

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>瓢蟲點點 | 數字樂園</title>
+<link rel="stylesheet" href="../css/style.css?v=6">
+</head>
+<body>
+<div class="page">
+  <div class="panel">
+    <div class="hint" id="hint"></div>
+    <div class="lb-row" id="lbRow"></div>
+    <div class="feedback" id="fb"></div>
+  </div>
+</div>
+<script src="../js/common.js?v=6"></script>
+<script>
+const INSTR = '找一找，哪一隻瓢蟲身上的點點跟題目一樣多？點點看！';
+const SLOTS = [[30, 25], [68, 25], [20, 45], [50, 40], [80, 45], [26, 65], [50, 58], [74, 65], [40, 82], [62, 82]];
+let round = 0;
+const TOTAL = 8;
+let targetN = 0, locked = false;
+
+function buildLadybug(k) {
+  const lb = document.createElement('button');
+  lb.className = 'lb';
+  lb.innerHTML = '<span class="lb-head"><i class="eye l"></i><i class="eye r"></i></span>' +
+    '<span class="lb-body"><span class="lb-line"></span></span>';
+  const body = lb.querySelector('.lb-body');
+  shuffle(SLOTS).slice(0, k).forEach(p => {
+    const s = document.createElement('i');
+    s.className = 'lb-spot';
+    s.style.left = p[0] + '%';
+    s.style.top = p[1] + '%';
+    body.appendChild(s);
+  });
+  lb.addEventListener('click', () => choose(lb, k));
+  return lb;
+}
+function newRound() {
+  locked = false;
+  round++;
+  if (round > TOTAL) {
+    showWin('你找到所有瓢蟲了！共 ' + starN + ' 顆星星！', start);
+    return;
+  }
+  targetN = randInt(2, 10);
+  const row = document.getElementById('lbRow');
+  row.innerHTML = '';
+  const opts = shuffle([targetN, ...wrongNums(targetN, 1, 10, 2)]);
+  opts.forEach(k => row.appendChild(buildLadybug(k)));
+  document.getElementById('hint').innerHTML = '第 ' + round + ' / ' + TOTAL + ' 題：哪一隻瓢蟲有 <span class="num">' + targetN + '</span> 個點點？';
+  const fb = document.getElementById('fb');
+  fb.textContent = '';
+  fb.className = 'feedback';
+  Voice.speak('找一找，哪一隻瓢蟲有' + numToCN(targetN) + '個點點？');
+}
+function choose(lb, k) {
+  if (locked) return;
+  locked = true;
+  const fb = document.getElementById('fb');
+  if (k === targetN) {
+    lb.classList.add('ok');
+    Sfx.good();
+    addStar(1);
+    confetti(26);
+    lb.querySelectorAll('.lb-spot').forEach((s, i) => setTimeout(() => { s.classList.add('pop'); }, i * 110));
+    fb.textContent = '答對了！這隻瓢蟲有 ' + targetN + ' 個點點！';
+    fb.className = 'feedback good';
+    Voice.speak('答對了！這隻瓢蟲有' + numToCN(targetN) + '個點點！');
+    setTimeout(newRound, 2300);
+  } else {
+    Sfx.bad();
+    showCross(...elCenter(lb));
+    shake(lb);
+    fb.textContent = '再數數看點點！';
+    fb.className = 'feedback badf';
+    Voice.speak('再數一數點點！');
+    setTimeout(() => { locked = false; }, 500);
+  }
+}
+function start() {
+  starN = 0;
+  const e = document.getElementById('starN');
+  if (e) e.textContent = '0';
+  round = 0;
+  locked = false;
+  newRound();
+}
+buildHeader('🐞 瓢蟲點點', INSTR);
+start();
+</script>
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>餵熊熊 | 數字樂園</title>
+<link rel="stylesheet" href="../css/style.css?v=6">
+</head>
+<body>
+<div class="page">
+  <div class="pick" id="modePick">
+    <button class="btn green" id="m1">🌱 數到 5</button>
+    <button class="btn purple" id="m2">🌳 數到 10</button>
+  </div>
+  <div class="panel">
+    <div class="hint" id="hint"></div>
+    <div class="feed-zone">
+      <div class="bear-side">
+        <div class="bear" id="bear">🐻</div>
+        <div class="fed-bubble">🍪 <b id="fedN">0</b></div>
+        <div class="belly" id="belly"></div>
+      </div>
+      <div class="plate" id="plate"></div>
+    </div>
+    <div class="feedback" id="fb"></div>
+  </div>
+</div>
+<script src="../js/common.js?v=6"></script>
+<script>
+const INSTR = '熊熊肚子好餓！照題目說的數量，點餅乾餵牠吃，一邊餵一邊大聲數！';
+let mode = 1;
+let round = 0;
+const TOTAL = 8;
+let target = 0, fed = 0, locked = false;
+
+function newRound() {
+  locked = false;
+  round++;
+  if (round > TOTAL) {
+    showWin('熊熊吃得好飽！你收集了 ' + starN + ' 顆星星！', start);
+    return;
+  }
+  const max = mode === 1 ? 5 : 10;
+  target = randInt(3, max);
+  fed = 0;
+  document.getElementById('fedN').textContent = '0';
+  document.getElementById('belly').innerHTML = '';
+  document.getElementById('bear').classList.remove('happy');
+  const plate = document.getElementById('plate');
+  plate.innerHTML = '';
+  for (let i = 0; i < 10; i++) {
+    const c = document.createElement('button');
+    c.className = 'cookie';
+    c.textContent = '🍪';
+    c.addEventListener('click', () => feed(c));
+    plate.appendChild(c);
+  }
+  document.getElementById('hint').innerHTML = '第 ' + round + ' / ' + TOTAL + ' 題：請餵熊熊 <span class="num">' + target + '</span> 塊餅乾！';
+  const fb = document.getElementById('fb');
+  fb.textContent = '';
+  fb.className = 'feedback';
+  Voice.speak('我肚子好餓！請餵我' + numToCN(target) + '塊餅乾！');
+}
+function feed(c) {
+  if (locked || c.classList.contains('gone')) return;
+  fed++;
+  c.classList.add('gone');
+  Sfx.pop();
+  const b = document.getElementById('belly');
+  const s = document.createElement('span');
+  s.className = 'belly-c';
+  s.textContent = '🍪';
+  b.appendChild(s);
+  document.getElementById('fedN').textContent = fed;
+  Voice.speak(numToCN(fed));
+  if (fed >= target) {
+    locked = true;
+    document.getElementById('bear').classList.add('happy');
+    setTimeout(() => {
+      Sfx.good();
+      addStar(1);
+      confetti(26);
+      const fb = document.getElementById('fb');
+      fb.textContent = '呼嚕嚕～熊熊吃飽了！';
+      fb.className = 'feedback good';
+      Voice.speak(numToCN(target) + '塊餅乾！我吃飽了，謝謝你！');
+      setTimeout(newRound, 2200);
+    }, 450);
+  }
+}
+function start() {
+  starN = 0;
+  const e = document.getElementById('starN');
+  if (e) e.textContent = '0';
+  round = 0;
+  locked = false;
+  newRound();
+}
+document.getElementById('m1').addEventListener('click', () => { Sfx.click(); mode = 1; document.getElementById('modePick').classList.add('hide'); start(); });
+document.getElementById('m2').addEventListener('click', () => { Sfx.click(); mode = 2; document.getElementById('modePick').classList.add('hide'); start(); });
+buildHeader('🐻 餵熊熊', INSTR);
+</script>
+</body>
+</html>
