@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>記憶配對 | 數字樂園</title>
-<link rel="stylesheet" href="../css/style.css?v=4">
+<link rel="stylesheet" href="../css/style.css?v=5">
 </head>
 <body>
 <div class="page">
@@ -24,7 +24,7 @@
     </div>
   </div>
 </div>
-<script src="../js/common.js?v=4"></script>
+<script src="../js/common.js?v=5"></script>
 <script>
 const INSTR = '翻翻卡片，找出數字和點點一樣多的那一對！';
 let mode = 1;
@@ -42,15 +42,13 @@ function safeShuffle(items) {
   for (let t = 0; t < 400; t++) {
     const s = shuffle(items);
     const pos = {};
-    s.forEach((it, i) => { pos[it[1]] = i; });
+    s.forEach((it, i) => {
+      (pos[it[1]] = pos[it[1]] || []).push(i);
+    });
     let ok = true;
-    const keys = Object.keys(pos);
-    for (let i = 0; i < keys.length; i++) {
-      for (let j = i + 1; j < keys.length; j++) {
-        const d = Math.abs(pos[keys[i]] - pos[keys[j]]);
-        if (d === 1 || d === cols) { ok = false; break; }
-      }
-      if (!ok) break;
+    for (const k in pos) {
+      const d = Math.abs(pos[k][0] - pos[k][1]);
+      if (d === 1 || d === cols) { ok = false; break; }
     }
     if (ok) return s;
     if (t === 399) return s;

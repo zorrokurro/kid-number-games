@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>跳跳數數 | 數字樂園</title>
-<link rel="stylesheet" href="../css/style.css?v=4">
+<link rel="stylesheet" href="../css/style.css?v=5">
 </head>
 <body>
 <div class="page">
@@ -16,7 +16,7 @@
     <div class="feedback" id="fb"></div>
   </div>
 </div>
-<script src="../js/common.js?v=4"></script>
+<script src="../js/common.js?v=5"></script>
 <script>
 const INSTR = '小青蛙要跳格子！照 1、2、3 的順序點數字，跳完十格就過關，一路跳到一百！';
 let level = 0;
@@ -25,8 +25,8 @@ let base = 1;
 let locked = false;
 
 function buildLevel() {
-  next = 1;
   base = level * 10;
+  next = base + 1;
   locked = false;
   const track = document.getElementById('track');
   track.querySelectorAll('.hop-stone').forEach(s => s.remove());
