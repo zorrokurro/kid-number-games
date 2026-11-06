@@ -76,6 +76,7 @@ function pickCrop(c, ev) {
   if (picked >= targetN) {
     locked = true;
     setTimeout(() => {
+      locked = false;
       const row = document.getElementById('ansRow');
       row.innerHTML = '';
       shuffle([targetN, ...wrongNums(targetN, 1, 10, 2)]).forEach(v => {
