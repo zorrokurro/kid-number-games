@@ -48,7 +48,8 @@ const Sfx = {
   pop() { beep(700, 0.06, 'square', 0.3); beep(320, 0.14, 'sine', 0.25, 0.04); },
   good() { beep(523, 0.12, 'triangle', 0.3); beep(659, 0.12, 'triangle', 0.3, 0.1); beep(784, 0.2, 'triangle', 0.3, 0.2); },
   bad() { beep(300, 0.14, 'square', 0.25); beep(210, 0.2, 'square', 0.25, 0.14); beep(140, 0.3, 'square', 0.22, 0.32); },
-  win() { [523, 659, 784, 1047].forEach((f, i) => beep(f, 0.18, 'triangle', 0.3, i * 0.12)); beep(1319, 0.4, 'triangle', 0.3, 0.55); }
+  win() { [523, 659, 784, 1047].forEach((f, i) => beep(f, 0.18, 'triangle', 0.3, i * 0.12)); beep(1319, 0.4, 'triangle', 0.3, 0.55); },
+  tick() { beep(900, 0.05, 'square', 0.18); }
 };
 
 const Voice = {

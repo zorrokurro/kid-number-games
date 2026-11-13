@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>數數問答站 | 數字樂園</title>
+<link rel="stylesheet" href="../css/style.css?v=9">
+</head>
+<body class="theme-quiz">
+<div class="page">
+  <div class="pick" id="modePick">
+    <button class="btn green" id="m1">🌱 輕鬆模式（不限時）</button>
+    <button class="btn purple" id="m2">🔥 限時挑戰（每題 15 秒）</button>
+  </div>
+  <div class="panel">
+    <div class="hint" id="hint"></div>
+    <div class="quiz-stage">
+      <div class="quiz-timer" id="qTimer">⏱</div>
+      <div class="quiz-card" id="qCard"></div>
+    </div>
+    <div class="quiz-opts" id="qOpts"></div>
+    <div class="quiz-progress"><div class="quiz-fill" id="qFill"></div><span class="quiz-pea">🫛</span></div>
+    <div class="feedback" id="fb"></div>
+  </div>
+</div>
+<script src="../js/common.js?v=9"></script>
+<script>
+const INSTR = '看圖數一數！題目問什麼就數什麼，在三個數字裡挑出正確答案！限時模式要動作快唷！';
+const SCENES = [
+  {
+    name: '海底', bg: 'linear-gradient(180deg,#7ec8f7 0%,#b8ecf7 70%,#ffe9b8 100%)',
+    props: ['🌿','🪨','🫧'],
+    groups: [
+      { name: '小魚', mw: '隻', emoji: ['🐠','🐟'] },
+      { name: '章魚', mw: '隻', emoji: ['🐙'] },
+      { name: '螃蟹', mw: '隻', emoji: ['🦀'] }
+    ]
+  },
+  {
+    name: '太空', bg: 'linear-gradient(180deg,#2b2e6b 0%,#5a3f8f 60%,#8a5fc4 100%)',
+    props: ['🪐','🚀'],
+    groups: [
+      { name: '星星', mw: '顆', emoji: ['⭐','🌟'], dark: true },
+      { name: '太空人', mw: '位', emoji: ['👨‍🚀'] },
+      { name: '火箭', mw: '艘', emoji: ['🚀'] }
+    ]
+  },
+  {
+    name: '愛心雨', bg: 'linear-gradient(180deg,#ffd9ec 0%,#fff3f8 100%)',
+    props: ['☁️','🌈'],
+    groups: [
+      { name: '紅色愛心', mw: '顆', emoji: ['❤️'] },
+      { name: '黃色愛心', mw: '顆', emoji: ['💛'] },
+      { name: '藍色愛心', mw: '顆', emoji: ['💙'] },
+      { name: '紫色愛心', mw: '顆', emoji: ['💜'] },
+      { name: '綠色愛心', mw: '顆', emoji: ['💚'] }
+    ]
+  },
+  {
+    name: '圓點派對', bg: 'linear-gradient(180deg,#fff3c9 0%,#ffe3ef 100%)',
+    props: ['🎉'],
+    groups: [
+      { name: '紅色圓點', mw: '個', emoji: ['🔴'] },
+      { name: '藍色圓點', mw: '個', emoji: ['🔵'] },
+      { name: '黃色圓點', mw: '個', emoji: ['🟡'] },
+      { name: '綠色圓點', mw: '個', emoji: ['🟢'] },
+      { name: '橘色圓點', mw: '個', emoji: ['🟠'] }
+    ]
+  },
+  {
+    name: '餅乾店', bg: 'linear-gradient(180deg,#ffe3b8 0%,#ffd0a8 100%)',
+    props: ['🍰','🍶'],
+    groups: [
+      { name: '餅乾', mw: '塊', emoji: ['🍪'] },
+      { name: '杯子蛋糕', mw: '個', emoji: ['🧁'] },
+      { name: '甜甜圈', mw: '個', emoji: ['🍩'] }
+    ]
+  },
+  {
+    name: '玩具箱', bg: 'linear-gradient(180deg,#d8ecff 0%,#e8d8ff 100%)',
+    props: ['📦','🎁'],
+    groups: [
+      { name: '玩具熊', mw: '隻', emoji: ['🧸'] },
+      { name: '小汽車', mw: '台', emoji: ['🚗'] },
+      { name: '皮球', mw: '顆', emoji: ['⚽'] }
+    ]
+  },
+  {
+    name: '花園', bg: 'linear-gradient(180deg,#b5e88c 0%,#e3f7c0 100%)',
+    props: ['🌳','🍄'],
+    groups: [
+      { name: '花', mw: '朵', emoji: ['🌻','🌸','🌺','🌷'] },
+      { name: '蝴蝶', mw: '隻', emoji: ['🦋'] },
+      { name: '蜜蜂', mw: '隻', emoji: ['🐝'] }
+    ]
+  },
+  {
+    name: '水果籃', bg: 'linear-gradient(180deg,#ffe0b8 0%,#d8f3c9 100%)',
+    props: ['🧺','🍇'],
+    groups: [
+      { name: '草莓', mw: '顆', emoji: ['🍓'] },
+      { name: '蘋果', mw: '顆', emoji: ['🍎'] },
+      { name: '香蕉', mw: '根', emoji: ['🍌'] }
+    ]
+  },
+  {
+    name: '蟲蟲派對', bg: 'linear-gradient(180deg,#c2e8a8 0%,#eaf8d8 100%)',
+    props: ['🍃','🌼'],
+    groups: [
+      { name: '瓢蟲', mw: '隻', emoji: ['🐞'] },
+      { name: '蝴蝶', mw: '隻', emoji: ['🦋'] },
+      { name: '螞蟻', mw: '隻', emoji: ['🐜'] }
+    ]
+  },
+  {
+    name: '氣球屋', bg: 'linear-gradient(180deg,#a9e4fa 0%,#ffe8c9 100%)',
+    props: ['☁️','🏠'],
+    groups: [
+      { name: '氣球', mw: '顆', emoji: ['🎈'] },
+      { name: '禮物盒', mw: '個', emoji: ['🎁'] },
+      { name: '蝴蝶結', mw: '個', emoji: ['🎀'] }
+    ]
+  }
+];
+let mode = 1;       // 1=輕鬆 2=限時
+let round = 0;
+const TOTAL = 10;
+let targetN = 0;
+let timerId = null;
+let timeLeft = 0;
+let locked = false;
+let answered = false;
+let lastSceneIdx = -1;
+
+function newRound() {
+  locked = false;
+  answered = false;
+  round++;
+  if (round > TOTAL) {
+    showWin('數數問答全部答完！共 ' + starN + ' 顆星星！', start);
+    return;
+  }
+  // 選場景（不連續重複）
+  let si;
+  do { si = randInt(0, SCENES.length - 1); } while (si === lastSceneIdx);
+  lastSceneIdx = si;
+  const scene = SCENES[si];
+  // 從場景的 groups 中挑題目組，其餘當干擾
+  const gi = randInt(0, scene.groups.length - 1);
+  const tg = scene.groups[gi];
+  const dg = scene.groups.filter((_, i) => i !== gi);
+  targetN = randInt(2, 9);
+  const disN = randInt(2, 5);
+  // 擺放：格子制避免全疊在一起
+  const card = document.getElementById('qCard');
+  card.innerHTML = '';
+  card.style.background = scene.bg;
+  // 場景角落裝飾
+  scene.props.forEach((p, i) => {
+    const d = document.createElement('span');
+    d.className = 'q-prop';
+    d.textContent = p;
+    d.style.left = (4 + i * 44) + '%';
+    d.style.bottom = '2%';
+    d.style.opacity = '.9';
+    card.appendChild(d);
+  });
+  const total = targetN + disN;
+  const cols = Math.ceil(Math.sqrt(total * 2.2));
+  const rows = Math.ceil(total / cols);
+  const cells = shuffle(Array.from({ length: cols * rows }, (_, i) => i)).slice(0, total);
+  const mk = (emoji, isTarget) => {
+    const s = document.createElement('span');
+    s.className = 'q-item' + (scene.dark ? ' q-dark' : '');
+    s.textContent = pick(emoji);
+    s.style.fontSize = randInt(40, 56) + 'px';
+    s.style.transform = 'rotate(' + randInt(-16, 16) + 'deg) ' + (Math.random() < .5 ? 'scaleX(-1)' : '');
+    return s;
+  };
+  const targets = Array.from({ length: targetN }, () => mk(tg.emoji, true));
+  const dis = Array.from({ length: disN }, () => mk(pick(dg).emoji, false));
+  shuffle(targets.concat(dis)).forEach((s, i) => {
+    const cell = cells[i];
+    const cx = (cell % cols + .5) / cols * 100;
+    const cy = (Math.floor(cell / cols) + .5) / rows * 100;
+    s.style.left = 'calc(' + cx + '% - 24px)';
+    s.style.top = 'calc(' + cy + '% - 28px)';
+    card.appendChild(s);
+  });
+  // 三個選項
+  const opts = shuffle([targetN, ...nearNums(targetN)]);
+  const box = document.getElementById('qOpts');
+  box.innerHTML = '';
+  opts.forEach(v => {
+    const b = document.createElement('button');
+    b.className = 'quiz-opt';
+    b.textContent = v;
+    b.addEventListener('click', () => choose(b, v));
+    box.appendChild(b);
+  });
+  // 進度條
+  const pct = Math.round((round - 1) / TOTAL * 100);
+  document.getElementById('qFill').style.width = pct + '%';
+  document.querySelector('.quiz-pea').style.left = pct + '%';
+  document.getElementById('hint').innerHTML = '第 ' + round + ' / ' + TOTAL + ' 題：數一數，有幾' + tg.mw + '<span style="color:#ff5f6f">' + tg.name + '</span>？';
+  const fb = document.getElementById('fb');
+  fb.textContent = '';
+  fb.className = 'feedback';
+  Voice.speak('第' + numToCN(round) + '題！數一數，有幾' + tg.mw + tg.name + '？');
+  // 計時
+  clearInterval(timerId);
+  const tEl = document.getElementById('qTimer');
+  if (mode === 2) {
+    timeLeft = 15;
+    tEl.textContent = timeLeft;
+    tEl.classList.remove('urgent');
+    timerId = setInterval(() => {
+      timeLeft--;
+      tEl.textContent = timeLeft;
+      if (timeLeft <= 3 && timeLeft > 0) {
+        tEl.classList.add('urgent');
+        Sfx.tick();
+      }
+      if (timeLeft <= 0) {
+        clearInterval(timerId);
+        timeUp(tg);
+      }
+    }, 1000);
+  } else {
+    tEl.textContent = '♾️';
+    tEl.classList.remove('urgent');
+  }
+}
+function nearNums(n) {
+  const s = new Set();
+  while (s.size < 2) {
+    const d = pick([-2, -1, 1, 2]);
+    const v = n + d;
+    if (v >= 1 && v <= 12) s.add(v);
+  }
+  return [...s];
+}
+function choose(btn, v) {
+  if (locked) return;
+  const fb = document.getElementById('fb');
+  if (v === targetN) {
+    locked = true;
+    answered = true;
+    clearInterval(timerId);
+    btn.classList.add('ok');
+    Sfx.good();
+    addStar(1);
+    confetti(26);
+    fb.textContent = '答對了！有 ' + targetN + ' 個！';
+    fb.className = 'feedback good';
+    Voice.speak('答對了！有' + numToCN(targetN) + '個，好棒！');
+    setTimeout(newRound, 1900);
+  } else {
+    Sfx.bad();
+    showCross(...elCenter(btn));
+    shake(btn);
+    fb.textContent = '再數一數，慢慢來！';
+    fb.className = 'feedback badf';
+    Voice.speak('再數一數！');
+  }
+}
+function timeUp(tg) {
+  if (answered || locked) return;
+  locked = true;
+  const hit = [...document.querySelectorAll('.quiz-opt')].find(b => parseInt(b.textContent) === targetN);
+  if (hit) hit.classList.add('reveal');
+  const fb = document.getElementById('fb');
+  fb.textContent = '⏰ 時間到！答案是 ' + targetN + '！';
+  fb.className = 'feedback badf';
+  Voice.speak('時間到！答案是' + numToCN(targetN) + '！下一題加油！');
+  setTimeout(newRound, 2200);
+}
+function start() {
+  starN = 0;
+  const e = document.getElementById('starN');
+  if (e) e.textContent = '0';
+  round = 0;
+  lastSceneIdx = -1;
+  clearInterval(timerId);
+  document.getElementById('qFill').style.width = '0%';
+  newRound();
+}
+document.getElementById('m1').addEventListener('click', () => { Sfx.click(); mode = 1; document.getElementById('modePick').classList.add('hide'); start(); });
+document.getElementById('m2').addEventListener('click', () => { Sfx.click(); mode = 2; document.getElementById('modePick').classList.add('hide'); start(); });
+buildHeader('🧮 數數問答站', INSTR);
+</script>
+</body>
+</html>

@@ -4,13 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>數字樂園 | 小朋友數學遊戲</title>
-<link rel="stylesheet" href="css/style.css?v=8">
+<link rel="stylesheet" href="css/style.css?v=9">
 </head>
 <body>
 <div class="page">
   <div class="lobby-hero">
     <h1>🔢 數字樂園</h1>
-    <p>歡迎來玩 16 個有趣的數字遊戲！點點卡片開始吧！</p>
+    <p>歡迎來玩 17 個有趣的數字遊戲！點點卡片開始吧！</p>
     <div class="hero-mascots" id="mascots">
       <span>🐻</span><span>🐸</span><span>🦋</span><span>🐛</span><span>🚂</span><span>🎈</span><span>🎂</span><span>🐞</span>
     </div>
@@ -101,10 +101,16 @@
       <div class="name">圖形規律</div>
       <div class="desc">紅藍紅藍…下一個是誰？</div>
     </a>
+    <a class="game-card card-c8" href="games/quiz.html" data-say="數數問答站，看圖數一數，在三個數字裡挑出正確答案！限時挑戰要動作快唷！">
+      <span class="is-new">🆕</span>
+      <span class="ico">🧮</span>
+      <div class="name">數數問答站</div>
+      <div class="desc">看圖數一數，限時挑答案！</div>
+    </a>
   </div>
   <p class="lobby-tip">🌈 玩遊戲收集星星，變成數字小達人！</p>
 </div>
-<script src="js/common.js?v=8"></script>
+<script src="js/common.js?v=9"></script>
 <script>
 document.getElementById('totalStars').textContent = localStorage.getItem('kid_stars') || '0';
 document.querySelectorAll('.game-card').forEach(c => {
