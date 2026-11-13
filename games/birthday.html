@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>生日蠟燭 | 數字樂園</title>
+<link rel="stylesheet" href="../css/style.css?v=8">
+</head>
+<body class="theme-candy">
+<div class="page">
+  <div class="pick" id="modePick">
+    <button class="btn green" id="m1">🌱 1~10</button>
+    <button class="btn purple" id="m2">🔥 11~20</button>
+  </div>
+  <div class="panel">
+    <div class="hint" id="hint"></div>
+    <div class="cake-scene">
+      <div class="cake" id="cake">
+        <div class="cake-top" id="cakeTop"></div>
+        <div class="cake-body" id="cakeBody"></div>
+        <div class="cake-plate"></div>
+      </div>
+    </div>
+    <div class="answer-row" id="ansRow"></div>
+    <div class="deco-zone" id="decoZone" style="display:none">
+      <div class="deco-ctl">
+        <div class="deco-label">🎨 奶油顏色</div>
+        <div class="swatch-row" id="swatchRow"></div>
+        <div class="deco-label">🍓 生日配料</div>
+        <div class="topping-row" id="toppingRow"></div>
+      </div>
+      <button class="btn green" id="decoDone">✅ 完成了！</button>
+    </div>
+    <div class="feedback" id="fb"></div>
+  </div>
+</div>
+<script src="../js/common.js?v=8"></script>
+<script>
+const INSTR = '數一數蛋糕上的蠟燭，點蠟燭幫忙數，再選出正確的歲數！答對 5 題可以自己裝飾蛋糕！';
+let mode = 1;
+let round = 0;
+const TOTAL = 5;
+let targetN = 0, lit = 0, locked = false;
+
+function newRound() {
+  locked = false;
+  lit = 0;
+  round++;
+  if (round > TOTAL) { startDeco(); return; }
+  const lo = mode === 1 ? 1 : 11;
+  const hi = mode === 1 ? 10 : 20;
+  targetN = randInt(lo, hi);
+  const top = document.getElementById('cakeTop');
+  top.innerHTML = '';
+  for (let i = 0; i < targetN; i++) {
+    const c = document.createElement('div');
+    c.className = 'candle';
+    c.style.setProperty('--cc', BCOLORS[randInt(0, BCOLORS.length - 1)]);
+    c.innerHTML = '<span class="flame"></span><span class="cnum"></span>';
+    c.addEventListener('click', () => lightCandle(c));
+    top.appendChild(c);
+  }
+  const row = document.getElementById('ansRow');
+  row.innerHTML = '';
+  row.style.display = 'flex';
+  shuffle([targetN, ...wrongNums(targetN, lo, hi, 2)]).forEach(v => {
+    const b = document.createElement('button');
+    b.className = 'num-btn nb' + (row.children.length + 1);
+    b.innerHTML = v + '<small>' + numToCN(v) + '</small>';
+    b.addEventListener('click', () => choose(b, v));
+    row.appendChild(b);
+  });
+  document.getElementById('hint').innerHTML = '第 ' + round + ' / ' + TOTAL + ' 題：蛋糕上放了幾根蠟燭？';
+  const fb = document.getElementById('fb');
+  fb.textContent = '';
+  fb.className = 'feedback';
+  Voice.speak('蛋糕上有幾根蠟燭？點蠟燭幫忙數，再選答案！');
+}
+function lightCandle(c) {
+  if (locked || c.classList.contains('lit')) return;
+  lit++;
+  c.classList.add('lit');
+  c.querySelector('.cnum').textContent = lit;
+  Sfx.pop();
+  Voice.speak(numToCN(lit));
+}
+function choose(btn, v) {
+  if (locked) return;
+  locked = true;
+  const fb = document.getElementById('fb');
+  if (v === targetN) {
+    btn.classList.add('ok');
+    Sfx.good();
+    addStar(1);
+    confetti(26);
+    document.querySelectorAll('.candle.lit').forEach((c, i) => setTimeout(() => c.classList.add('out'), i * 120));
+    fb.textContent = '答對了！' + numToCN(targetN) + ' 歲生日快樂！🎂';
+    fb.className = 'feedback good';
+    Voice.speak(numToCN(targetN) + '根蠟燭，答對了！生日快樂！');
+    setTimeout(newRound, 2500);
+  } else {
+    Sfx.bad();
+    showCross(...elCenter(btn));
+    shake(btn);
+    fb.textContent = '再數一數蠟燭！';
+    fb.className = 'feedback badf';
+    Voice.speak('再數一數蠟燭！');
+    setTimeout(() => { locked = false; }, 500);
+  }
+}
+function startDeco() {
+  document.getElementById('ansRow').style.display = 'none';
+  document.getElementById('decoZone').style.display = '';
+  document.getElementById('cakeTop').innerHTML = '';
+  document.getElementById('hint').innerHTML = '🎉 答對 ' + TOTAL + ' 題了！來裝飾你的生日蛋糕！';
+  const fb = document.getElementById('fb');
+  fb.textContent = '';
+  fb.className = 'feedback';
+  const sw = document.getElementById('swatchRow');
+  sw.innerHTML = '';
+  const FROSTS = [['粉紅色', '#f7a8c4'], ['黃色', '#ffd24d'], ['薄荷綠', '#8fe3c0'], ['天空藍', '#8fd8ff'], ['香芋紫', '#c9a8f0']];
+  FROSTS.forEach(f => {
+    const s = document.createElement('button');
+    s.className = 'swatch';
+    s.style.background = f[1];
+    s.title = f[0];
+    s.addEventListener('click', () => {
+      Sfx.pop();
+      document.getElementById('cakeBody').style.setProperty('--frost', f[1]);
+    });
+    sw.appendChild(s);
+  });
+  const tr = document.getElementById('toppingRow');
+  tr.innerHTML = '';
+  ['🍓', '🍬', '🍫', '🌈'].forEach(t => {
+    const b = document.createElement('button');
+    b.className = 'btn pink icon';
+    b.textContent = t;
+    b.addEventListener('click', () => {
+      Sfx.pop();
+      const body = document.getElementById('cakeBody');
+      if (body.querySelectorAll('.deco-top').length >= 20) return;
+      const s = document.createElement('span');
+      s.className = 'deco-top';
+      s.textContent = t;
+      s.style.left = randInt(6, 88) + '%';
+      s.style.top = randInt(8, 62) + '%';
+      s.style.transform = 'rotate(' + randInt(-20, 20) + 'deg)';
+      body.appendChild(s);
+    });
+    tr.appendChild(b);
+  });
+  const clr = document.createElement('button');
+  clr.className = 'btn orange icon';
+  clr.textContent = '🧹 清乾淨';
+  clr.addEventListener('click', () => { Sfx.click(); document.getElementById('cakeBody').querySelectorAll('.deco-top').forEach(e => e.remove()); });
+  tr.appendChild(clr);
+  document.getElementById('decoDone').onclick = () => {
+    Sfx.win();
+    confetti(60);
+    Voice.speak('好漂亮的蛋糕！生日快樂！');
+    showWin('你裝飾好了生日蛋糕！共 ' + starN + ' 顆星星！', start);
+  };
+  Voice.speak('答對' + numToCN(TOTAL) + '題了！來裝飾你的生日蛋糕！');
+}
+function start() {
+  starN = 0;
+  const e = document.getElementById('starN');
+  if (e) e.textContent = '0';
+  round = 0;
+  locked = false;
+  document.getElementById('decoZone').style.display = 'none';
+  document.getElementById('cakeBody').querySelectorAll('.deco-top').forEach(e => e.remove());
+  document.getElementById('cakeBody').style.removeProperty('--frost');
+  newRound();
+}
+document.getElementById('m1').addEventListener('click', () => { Sfx.click(); mode = 1; document.getElementById('modePick').classList.add('hide'); start(); });
+document.getElementById('m2').addEventListener('click', () => { Sfx.click(); mode = 2; document.getElementById('modePick').classList.add('hide'); start(); });
+buildHeader('🎂 生日蠟燭', INSTR);
+</script>
+</body>
+</html>

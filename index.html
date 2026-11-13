@@ -4,13 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>數字樂園 | 小朋友數學遊戲</title>
-<link rel="stylesheet" href="css/style.css?v=7">
+<link rel="stylesheet" href="css/style.css?v=8">
 </head>
 <body>
 <div class="page">
   <div class="lobby-hero">
     <h1>🔢 數字樂園</h1>
-    <p>歡迎來玩 12 個有趣的數字遊戲！點點卡片開始吧！</p>
+    <p>歡迎來玩 16 個有趣的數字遊戲！點點卡片開始吧！</p>
+    <div class="hero-mascots" id="mascots">
+      <span>🐻</span><span>🐸</span><span>🦋</span><span>🐛</span><span>🚂</span><span>🎈</span><span>🎂</span><span>🐞</span>
+    </div>
     <div class="lobby-stars">⭐ <span>收集到的星星：</span><b id="totalStars">0</b> <span>顆</span></div>
   </div>
   <div class="game-grid">
@@ -74,15 +77,53 @@
       <div class="name">收蔬菜</div>
       <div class="desc">採收蔬菜，一邊採一邊數！</div>
     </a>
+    <a class="game-card card-c6" href="games/birthday.html" data-say="生日蠟燭，數一數蛋糕上的蠟燭，選出幾歲生日！答對五題可以自己裝飾蛋糕！">
+      <span class="is-new">🆕</span>
+      <span class="ico">🎂</span>
+      <div class="name">生日蠟燭</div>
+      <div class="desc">數蠟燭選歲數，還能裝飾蛋糕！</div>
+    </a>
+    <a class="game-card card-c9" href="games/bingo.html" data-say="數字賓果，注意聽叫號，快點在賓果盤上找出它，連成一線就賓果！">
+      <span class="is-new">🆕</span>
+      <span class="ico">🔢</span>
+      <div class="name">數字賓果</div>
+      <div class="desc">聽叫號點數字，連線喊 BINGO！</div>
+    </a>
+    <a class="game-card card-c7" href="games/fuzz.html" data-say="毛毛蟲分類，把毛絨蟲放進一樣顏色的罐子，再數數看，最後打造自己的毛毛蟲！">
+      <span class="is-new">🆕</span>
+      <span class="ico">🐛</span>
+      <div class="name">毛毛蟲分類</div>
+      <div class="desc">分顏色、數數量、做毛毛蟲！</div>
+    </a>
+    <a class="game-card card-c3" href="games/patterns.html" data-say="圖形規律，看看排法的規律，猜猜問號後面是誰！">
+      <span class="is-new">🆕</span>
+      <span class="ico">🔁</span>
+      <div class="name">圖形規律</div>
+      <div class="desc">紅藍紅藍…下一個是誰？</div>
+    </a>
   </div>
   <p class="lobby-tip">🌈 玩遊戲收集星星，變成數字小達人！</p>
 </div>
-<script src="js/common.js?v=7"></script>
+<script src="js/common.js?v=8"></script>
 <script>
 document.getElementById('totalStars').textContent = localStorage.getItem('kid_stars') || '0';
 document.querySelectorAll('.game-card').forEach(c => {
   c.addEventListener('mouseenter', () => { try { Voice.speak(c.dataset.say); } catch (e) {} });
 });
+// 飄浮數字背景
+(function () {
+  const nums = ['1','2','3','4','5','6','7','8','9','10'];
+  for (let i = 0; i < 10; i++) {
+    const d = document.createElement('div');
+    d.className = 'fnum';
+    d.textContent = nums[i % nums.length];
+    d.style.left = (4 + i * 9.6) + '%';
+    d.style.fontSize = (22 + Math.random() * 22) + 'px';
+    d.style.animationDuration = (16 + Math.random() * 14) + 's';
+    d.style.animationDelay = (-Math.random() * 18) + 's';
+    document.body.appendChild(d);
+  }
+})();
 </script>
 </body>
 </html>

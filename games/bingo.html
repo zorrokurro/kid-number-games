@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>數字賓果 | 數字樂園</title>
+<link rel="stylesheet" href="../css/style.css?v=8">
+</head>
+<body class="theme-carnival">
+<div class="page">
+  <div class="pick" id="modePick">
+    <button class="btn green" id="m1">🌱 1~10</button>
+    <button class="btn purple" id="m2">🔥 11~20</button>
+  </div>
+  <div class="panel">
+    <div class="hint" id="hint"></div>
+    <div class="call-banner" id="callBanner">🎯</div>
+    <div class="bingo-grid" id="grid"></div>
+    <div class="feedback" id="fb"></div>
+  </div>
+</div>
+<script src="../js/common.js?v=8"></script>
+<script>
+const INSTR = '注意聽！老師會叫號碼，快點在賓果盤上找出它！連成一條線就大聲喊 BINGO！';
+const LINES = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+let mode = 1;
+let board = [];
+let calls = [];
+let callIdx = 0;
+let hits = new Set();
+let linesDone = new Set();
+let locked = false;
+
+function newGame() {
+  hits = new Set();
+  linesDone = new Set();
+  callIdx = 0;
+  locked = false;
+  const lo = mode === 1 ? 1 : 11;
+  const hi = mode === 1 ? 10 : 20;
+  const pool = [];
+  for (let n = lo; n <= hi; n++) pool.push(n);
+  board = shuffle(pool).slice(0, 9);
+  calls = shuffle(board.slice());
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  board.forEach((n, i) => {
+    const c = document.createElement('button');
+    c.className = 'bingo-cell';
+    c.innerHTML = '<span class="bn">' + n + '</span><span class="bh">⭐</span>';
+    c.addEventListener('click', ev => clickCell(c, n, i, ev));
+    grid.appendChild(c);
+  });
+  document.getElementById('fb').textContent = '';
+  document.getElementById('fb').className = 'feedback';
+  callNext();
+}
+function callNext() {
+  if (callIdx >= calls.length) return;
+  const n = calls[callIdx];
+  const b = document.getElementById('callBanner');
+  b.textContent = n;
+  b.classList.remove('call-pop');
+  void b.offsetWidth;
+  b.classList.add('call-pop');
+  document.getElementById('hint').innerHTML = '聽！這個號碼是 <span class="num">' + numToCN(n) + '</span>，快在盤子上點它！';
+  Voice.speak(numToCN(n) + '！找找看！');
+}
+function clickCell(cell, n, i, ev) {
+  if (locked || hits.has(i)) return;
+  const want = calls[callIdx];
+  if (n !== want) {
+    Sfx.bad();
+    showCross(...elCenter(cell));
+    shake(cell);
+    const fb = document.getElementById('fb');
+    fb.textContent = '不是這個號碼！再聽一次：' + numToCN(want) + '！';
+    fb.className = 'feedback badf';
+    Voice.speak('不是這個喔！找找看' + numToCN(want) + '！');
+    return;
+  }
+  Sfx.pop();
+  locked = true;
+  hits.add(i);
+  cell.classList.add('hit');
+  addStar(1);
+  const fb = document.getElementById('fb');
+  fb.textContent = '✨ ' + numToCN(n) + '！找對了！';
+  fb.className = 'feedback good';
+  checkLines();
+  setTimeout(() => {
+    locked = false;
+    callIdx++;
+    if (callIdx >= calls.length) {
+      showWin('賓果盤全部完成了！連了 ' + linesDone.size + ' 條線，共 ' + starN + ' 顆星星！', newGame);
+      return;
+    }
+    callNext();
+  }, 900);
+}
+function checkLines() {
+  const cells = [...document.querySelectorAll('.bingo-cell')];
+  LINES.forEach((line, li) => {
+    if (linesDone.has(li)) return;
+    if (line.every(i => hits.has(i))) {
+      linesDone.add(li);
+      line.forEach(i => cells[i].classList.add('line'));
+      Sfx.win();
+      addStar(3);
+      confetti(50);
+      const banner = document.createElement('div');
+      banner.className = 'bingo-banner';
+      banner.textContent = '🎉 BINGO！連成一線了！';
+      document.querySelector('.panel').appendChild(banner);
+      setTimeout(() => banner.remove(), 2200);
+      Voice.speak('BINGO！連成一線了，太厲害了！');
+    }
+  });
+}
+function start() {
+  starN = 0;
+  const e = document.getElementById('starN');
+  if (e) e.textContent = '0';
+  newGame();
+}
+document.getElementById('m1').addEventListener('click', () => { Sfx.click(); mode = 1; document.getElementById('modePick').classList.add('hide'); start(); });
+document.getElementById('m2').addEventListener('click', () => { Sfx.click(); mode = 2; document.getElementById('modePick').classList.add('hide'); start(); });
+buildHeader('🔢 數字賓果', INSTR);
+</script>
+</body>
+</html>

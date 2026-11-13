@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>毛毛蟲分類 | 數字樂園</title>
+<link rel="stylesheet" href="../css/style.css?v=8">
+</head>
+<body class="theme-garden">
+<div class="page">
+  <div class="panel">
+    <div class="hint" id="hint"></div>
+    <div class="bug-table" id="bugTable"></div>
+    <div class="jar-row" id="jarRow"></div>
+    <div class="feedback" id="fb"></div>
+    <div class="count-quiz" id="countQuiz" style="display:none">
+      <div class="quiz-q" id="quizQ"></div>
+      <div class="answer-row" id="quizAns"></div>
+    </div>
+    <div class="cater-zone" id="caterZone" style="display:none">
+      <div class="cater-label">🐍 點毛毛蟲的身體，再選顏色幫牠穿新衣！</div>
+      <div class="caterp" id="caterp"></div>
+      <div class="swatch-row" id="caterPalette"></div>
+      <button class="btn green" id="caterDone">✅ 完成了！</button>
+    </div>
+  </div>
+</div>
+<script src="../js/common.js?v=8"></script>
+<script>
+const INSTR = '毛絨蟲跑出來了！點一隻蟲蟲，再點牠的顏色罐子，把牠放回家！分完再數數看！';
+const COLORS = [
+  { name: '紅色', hex: '#ff5f6f' },
+  { name: '藍色', hex: '#54a7ff' },
+  { name: '黃色', hex: '#ffc63c' },
+  { name: '綠色', hex: '#43d19e' },
+  { name: '紫色', hex: '#b06ef7' },
+  { name: '橘色', hex: '#ff9d54' }
+];
+let round = 0;
+const TOTAL = 3;
+let jars = [];        // 本輪使用的顏色
+let counts = {};      // 顏色 hex → 數量
+let selected = null;  // 選取的蟲蟲 DOM
+let locked = false;
+let lastColors = [];
+
+function newRound() {
+  locked = false;
+  selected = null;
+  round++;
+  if (round > TOTAL) { startCount(); return; }
+  // 挑 3 種顏色（和上一輪不完全一樣）
+  let cs;
+  do { cs = shuffle(COLORS.slice()).slice(0, 3); } while (lastColors.length && cs.every(c => lastColors.includes(c)));
+  lastColors = cs.map(c => c.hex);
+  jars = cs;
+  counts = {};
+  const table = document.getElementById('bugTable');
+  table.innerHTML = '';
+  const row = document.getElementById('jarRow');
+  row.innerHTML = '';
+  cs.forEach(c => {
+    const n = randInt(2, 3);
+    counts[c.hex] = n;
+    for (let i = 0; i < n; i++) table.appendChild(makeBug(c));
+    row.appendChild(makeJar(c));
+  });
+  document.getElementById('hint').innerHTML = '第 ' + round + ' / ' + TOTAL + ' 輪：點一隻蟲蟲，再點牠的顏色罐子！';
+  const fb = document.getElementById('fb');
+  fb.textContent = '';
+  fb.className = 'feedback';
+  Voice.speak('把毛絨蟲放進一樣顏色的罐子！點一隻蟲蟲！');
+}
+function makeBug(c) {
+  const b = document.createElement('button');
+  b.className = 'bug';
+  b.style.setProperty('--bc', c.hex);
+  b.title = c.name;
+  b.addEventListener('click', () => {
+    if (locked) return;
+    Sfx.pop();
+    document.querySelectorAll('.bug.sel').forEach(x => x.classList.remove('sel'));
+    b.classList.add('sel');
+    selected = b;
+    const fb = document.getElementById('fb');
+    fb.textContent = '抓到' + c.name + '的蟲蟲！現在點罐子！';
+    fb.className = 'feedback';
+    Voice.speak(c.name + '的蟲蟲！點一樣顏色的罐子！');
+  });
+  return b;
+}
+function makeJar(c) {
+  const j = document.createElement('button');
+  j.className = 'jar';
+  j.style.setProperty('--jc', c.hex);
+  j.innerHTML = '<span class="jar-in"></span><span class="jar-label">' + c.name + '</span>';
+  j.addEventListener('click', () => {
+    if (locked) return;
+    if (!selected) {
+      Sfx.bad();
+      shake(j);
+      const fb = document.getElementById('fb');
+      fb.textContent = '先點一隻蟲蟲！';
+      fb.className = 'feedback badf';
+      Voice.speak('先點一隻蟲蟲！');
+      return;
+    }
+    const bugColor = selected.style.getPropertyValue('--bc').trim();
+    if (bugColor !== c.hex) {
+      Sfx.bad();
+      shake(j);
+      showCross(...elCenter(j));
+      const fb = document.getElementById('fb');
+      fb.textContent = '顏色不一樣喔！這是' + c.name + '罐！';
+      fb.className = 'feedback badf';
+      Voice.speak('顏色不一樣喔！找一樣顏色的罐子！');
+      return;
+    }
+    Sfx.good();
+    locked = true;
+    const bug = selected;
+    selected = null;
+    bug.classList.add('fly');
+    const jarIn = j.querySelector('.jar-in');
+    jarIn.appendChild(bug);
+    const fb = document.getElementById('fb');
+    fb.textContent = '✨ 回對家了！';
+    fb.className = 'feedback good';
+    Voice.speak('回對家了！');
+    setTimeout(() => {
+      locked = false;
+      if (!document.querySelector('#bugTable .bug')) {
+        // 全部分完 → 本輪過關
+        confetti(30);
+        addStar(2);
+        Sfx.win();
+        fb.textContent = '全部回家了！好棒！';
+        fb.className = 'feedback good';
+        setTimeout(newRound, 1800);
+      }
+    }, 600);
+  });
+  return j;
+}
+function startCount() {
+  document.getElementById('bugTable').style.display = 'none';
+  document.getElementById('jarRow').style.display = 'none';
+  const quiz = document.getElementById('countQuiz');
+  quiz.style.display = '';
+  askQuiz();
+}
+function askQuiz() {
+  const jarColors = Object.keys(counts);
+  if (!jarColors.length) { startCater(); return; }
+  const hex = pick(jarColors);
+  const c = COLORS.find(x => x.hex === hex);
+  const n = counts[hex];
+  const q = document.getElementById('quizQ');
+  q.innerHTML = '數一數：<span style="color:' + hex + ';font-weight:900">' + c.name + '</span>的蟲蟲有幾隻？';
+  Voice.speak('數一數，' + c.name + '的蟲蟲有幾隻？');
+  const row = document.getElementById('quizAns');
+  row.innerHTML = '';
+  shuffle([n, ...wrongNums(n, 1, 10, 2)]).forEach(v => {
+    const b = document.createElement('button');
+    b.className = 'num-btn nb' + (row.children.length + 1);
+    b.innerHTML = v + '<small>' + numToCN(v) + '</small>';
+    b.addEventListener('click', () => {
+      if (v === n) {
+        b.classList.add('ok');
+        Sfx.good();
+        addStar(2);
+        confetti(26);
+        Voice.speak('答對了！' + c.name + '的有' + numToCN(n) + '隻！');
+        delete counts[hex];
+        setTimeout(askQuiz, 1600);
+      } else {
+        Sfx.bad();
+        shake(b);
+        showCross(...elCenter(b));
+        Voice.speak('再數一數！');
+      }
+    });
+    row.appendChild(b);
+  });
+}
+function startCater() {
+  document.getElementById('countQuiz').style.display = 'none';
+  const zone = document.getElementById('caterZone');
+  zone.style.display = '';
+  document.getElementById('hint').innerHTML = '🎉 全部分對了！來打造你的毛毛蟲！';
+  const cp = document.getElementById('caterp');
+  cp.innerHTML = '';
+  for (let i = 0; i < 5; i++) {
+    const s = document.createElement('button');
+    s.className = 'cseg';
+    s.addEventListener('click', () => {
+      Sfx.pop();
+      const pal = document.getElementById('caterPalette');
+      pal.classList.add('show');
+      document.querySelectorAll('.cseg.sel').forEach(x => x.classList.remove('sel'));
+      s.classList.add('sel');
+    });
+    cp.appendChild(s);
+  }
+  const head = document.createElement('span');
+  head.className = 'chead';
+  head.innerHTML = '😀';
+  cp.appendChild(head);
+  const pal = document.getElementById('caterPalette');
+  pal.innerHTML = '';
+  COLORS.forEach(c => {
+    const sw = document.createElement('button');
+    sw.className = 'swatch';
+    sw.style.background = c.hex;
+    sw.title = c.name;
+    sw.addEventListener('click', () => {
+      const sel = document.querySelector('.cseg.sel');
+      if (!sel) return;
+      Sfx.pop();
+      sel.style.setProperty('--sc', c.hex);
+      sel.classList.add('painted');
+    });
+    pal.appendChild(sw);
+  });
+  document.getElementById('caterDone').onclick = () => {
+    Sfx.win();
+    confetti(60);
+    Voice.speak('好可愛的毛毛蟲！');
+    showWin('你做好了彩色毛毛蟲！共 ' + starN + ' 顆星星！', start);
+  };
+  Voice.speak('全部分對了！點毛毛蟲的身體，幫牠選顏色！');
+}
+function start() {
+  starN = 0;
+  const e = document.getElementById('starN');
+  if (e) e.textContent = '0';
+  round = 0;
+  lastColors = [];
+  document.getElementById('bugTable').style.display = '';
+  document.getElementById('jarRow').style.display = '';
+  document.getElementById('countQuiz').style.display = 'none';
+  document.getElementById('caterZone').style.display = 'none';
+  newRound();
+}
+buildHeader('🐛 毛毛蟲分類', INSTR);
+</script>
+</body>
+</html>

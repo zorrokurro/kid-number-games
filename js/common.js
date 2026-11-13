@@ -143,6 +143,7 @@ function showWin(msg, onReplay) {
   const mask = document.createElement('div');
   mask.className = 'win-mask';
   mask.innerHTML = '<div class="win-card"><div class="big">🎉</div><div>' + msg + '</div>' +
+    '<div class="win-stars">⭐ ' + starN + ' ⭐</div>' +
     '<div class="row"><button class="btn green" id="reBtn">🔄 再玩一次</button>' +
     '<a class="btn pink" href="../index.html">🏠 回大廳</a></div></div>';
   document.body.appendChild(mask);
