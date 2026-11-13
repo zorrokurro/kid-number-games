@@ -165,11 +165,14 @@ function askQuiz() {
     b.className = 'num-btn nb' + (row.children.length + 1);
     b.innerHTML = v + '<small>' + numToCN(v) + '</small>';
     b.addEventListener('click', () => {
+      const fb = document.getElementById('fb');
       if (v === n) {
         b.classList.add('ok');
         Sfx.good();
         addStar(2);
         confetti(26);
+        fb.textContent = '答對了！' + c.name + '的有 ' + n + ' 隻！';
+        fb.className = 'feedback good';
         Voice.speak('答對了！' + c.name + '的有' + numToCN(n) + '隻！');
         delete counts[hex];
         setTimeout(askQuiz, 1600);
@@ -177,6 +180,8 @@ function askQuiz() {
         Sfx.bad();
         shake(b);
         showCross(...elCenter(b));
+        fb.textContent = '再數一數' + c.name + '的蟲蟲！';
+        fb.className = 'feedback badf';
         Voice.speak('再數一數！');
       }
     });
