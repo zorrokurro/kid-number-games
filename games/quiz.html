@@ -181,8 +181,8 @@ function newRound() {
   shuffle(targets.concat(dis)).forEach((s, i) => {
     const cell = cells[i];
     const jx = randInt(-6, 6), jy = randInt(-5, 5);
-    const cx = (cell % cols + .5) / cols * 100 + jx;
-    const cy = (Math.floor(cell / cols) + .5) / rows * 100 + jy;
+    const cx = (cell % cols + .5) / cols * 100 + jx * 0.16;
+    const cy = (Math.floor(cell / cols) + .5) / rows * 100 + jy * 0.31;
     s.style.left = 'calc(' + cx + '% - 25px)';
     s.style.top = 'calc(' + cy + '% - 27px)';
     card.appendChild(s);
