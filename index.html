@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>數字樂園 | 小朋友數學遊戲</title>
-<link rel="stylesheet" href="css/style.css?v=10">
+<link rel="stylesheet" href="css/style.css?v=11">
 </head>
 <body>
 <div class="page">
@@ -32,10 +32,10 @@
       <div class="name">記憶配對</div>
       <div class="desc">翻翻卡片，找到一樣的數字！</div>
     </a>
-    <a class="game-card card-c4" href="games/compare.html" data-say="比一比，哪一邊比較多呢？">
+    <a class="game-card card-c4" href="games/compare.html" data-say="比一比，先數一數兩邊有幾個，寫下數字，再把比較多的打勾！">
       <span class="ico">🍎</span>
       <div class="name">比一比</div>
-      <div class="desc">哪一邊的蘋果比較多？</div>
+      <div class="desc">先寫數字，再把多的打 ✓！</div>
     </a>
     <a class="game-card card-c5" href="games/balloons.html" data-say="點氣球，點爆正確的數字氣球！">
       <span class="ico">🎈</span>
@@ -115,7 +115,7 @@
   </div>
   <p class="lobby-tip">🌈 玩遊戲收集星星，變成數字小達人！</p>
 </div>
-<script src="js/common.js?v=10"></script>
+<script src="js/common.js?v=11"></script>
 <script>
 document.getElementById('totalStars').textContent = localStorage.getItem('kid_stars') || '0';
 document.querySelectorAll('.game-card').forEach(c => {

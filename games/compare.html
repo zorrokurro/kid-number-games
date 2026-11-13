@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>比一比 | 數字樂園</title>
-<link rel="stylesheet" href="../css/style.css?v=10">
+<link rel="stylesheet" href="../css/style.css?v=11">
 </head>
 <body class="theme-candy">
 <div class="page">
@@ -13,28 +13,34 @@
     <button class="btn purple" id="m2">🔥 11~20</button>
   </div>
   <div class="panel">
-    <div class="hint" id="hint">哪一邊比較多？點點看！</div>
+    <div class="hint" id="hint"></div>
     <div class="cmp-box" id="cmpBox">
+      <svg class="cmp-svg" id="cmpSvg"></svg>
       <div class="cmp-side cmp-left" id="left">
-        <div class="cmp-num show" id="numL"></div>
         <div class="cmp-items" id="leftItems"></div>
+        <div class="cmp-write" id="writeL">?</div>
       </div>
       <div class="cmp-side cmp-right" id="right">
-        <div class="cmp-num show" id="numR"></div>
         <div class="cmp-items" id="rightItems"></div>
+        <div class="cmp-write" id="writeR">?</div>
       </div>
     </div>
+    <div class="cmp-tools" id="cmpTools"></div>
+    <div class="num-pad" id="numPad"></div>
     <div class="feedback" id="fb"></div>
   </div>
 </div>
-<script src="../js/common.js?v=10"></script>
+<script src="../js/common.js?v=11"></script>
 <script>
-const INSTR = '哪一邊比較多？點點看！也可以點水果幫忙數唷。答錯了沒關係，可以再試一次！';
+const INSTR = '像練習單一樣：先數一數兩邊有幾個，點數字寫下來，再點比較多的那一邊打 ✓！也可以點水果幫忙數唷。';
 let mode = 1;
 let round = 0;
-const TOTAL = 10;
+const TOTAL = 8;
 let leftN = 0, rightN = 0;
+let phase = 'countL';
+let leftDone = false, rightDone = false;
 let locked = false;
+let lastLeft = 0, lastRight = 0;
 
 function fillSide(box, n, fruit) {
   box.innerHTML = '';
@@ -54,11 +60,112 @@ function fillSide(box, n, fruit) {
     box.appendChild(s);
   }
 }
+function buildPad() {
+  const pad = document.getElementById('numPad');
+  pad.innerHTML = '';
+  const lo = mode === 1 ? 1 : 11;
+  for (let v = lo; v < lo + 10; v++) {
+    const b = document.createElement('button');
+    b.className = 'npad';
+    b.textContent = v;
+    b.addEventListener('click', () => padClick(v, b));
+    pad.appendChild(b);
+  }
+}
+function padClick(v, btn) {
+  if (locked) return;
+  if (phase !== 'countL' && phase !== 'countR') return;
+  const isL = phase === 'countL';
+  const want = isL ? leftN : rightN;
+  if (v !== want) {
+    Sfx.bad();
+    showCross(...elCenter(btn));
+    shake(btn);
+    const fb = document.getElementById('fb');
+    fb.textContent = '再數一數' + (isL ? '左' : '右') + '邊！可以點水果幫忙數！';
+    fb.className = 'feedback badf';
+    Voice.speak('再數一數' + (isL ? '左' : '右') + '邊有幾個！');
+    return;
+  }
+  Sfx.good();
+  const box = document.getElementById(isL ? 'writeL' : 'writeR');
+  box.textContent = v;
+  box.classList.add('filled');
+  box.classList.remove('active');
+  const fb = document.getElementById('fb');
+  fb.textContent = '✏️ 寫好了！' + (isL ? '左' : '右') + '邊有 ' + v + ' 個！';
+  fb.className = 'feedback good';
+  if (isL) {
+    leftDone = true;
+    phase = 'countR';
+    document.getElementById('writeR').classList.add('active');
+    document.getElementById('hint').innerHTML = '第 ' + round + ' / ' + TOTAL + ' 題：<span style="color:#ff5f6f">右邊</span>有幾個？點數字寫下來！';
+    Voice.speak('左邊有' + numToCN(leftN) + '個！現在數一數，右邊有幾個？');
+  } else {
+    rightDone = true;
+    phase = 'choose';
+    document.getElementById('hint').innerHTML = '第 ' + round + ' / ' + TOTAL + ' 題：兩邊都寫好了！<span style="color:#ff5f6f">哪一邊比較多？</span>點它打 ✓！';
+    Voice.speak('兩邊都寫好了！比一比，哪一邊比較多？點它打勾！');
+    buildTools();
+  }
+}
+function buildTools() {
+  const tools = document.getElementById('cmpTools');
+  tools.innerHTML = '';
+  const hintBtn = document.createElement('button');
+  hintBtn.className = 'btn blue icon';
+  hintBtn.textContent = '🤝 配對提示';
+  hintBtn.addEventListener('click', () => {
+    if (locked || phase !== 'choose') return;
+    Sfx.click();
+    drawPairing(() => {
+      const moreSide = leftN > rightN ? '左' : '右';
+      Voice.speak('一對一配對看看！多出來的在' + moreSide + '邊，那就是比較多的！');
+      const fb = document.getElementById('fb');
+      fb.textContent = '👀 有配對到的一樣多，多出來的在 ' + moreSide + ' 邊！';
+      fb.className = 'feedback';
+    });
+  });
+  tools.appendChild(hintBtn);
+}
+function drawPairing(done) {
+  const svg = document.getElementById('cmpSvg');
+  const boxR = document.getElementById('cmpBox').getBoundingClientRect();
+  svg.innerHTML = '';
+  svg.setAttribute('viewBox', '0 0 ' + Math.round(boxR.width) + ' ' + Math.round(boxR.height));
+  const lItems = [...document.querySelectorAll('#leftItems .cmp-item')];
+  const rItems = [...document.querySelectorAll('#rightItems .cmp-item')];
+  const n = Math.min(lItems.length, rItems.length);
+  const center = el => {
+    const b = el.getBoundingClientRect();
+    return [b.left + b.width / 2 - boxR.left, b.top + b.height / 2 - boxR.top];
+  };
+  for (let i = 0; i < n; i++) {
+    setTimeout(() => {
+      const [x1, y1] = center(lItems[i]);
+      const [x2, y2] = center(rItems[i]);
+      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line.setAttribute('x1', x1); line.setAttribute('y1', y1);
+      line.setAttribute('x2', x2); line.setAttribute('y2', y2);
+      line.setAttribute('class', 'pair-line');
+      svg.appendChild(line);
+      Sfx.pop();
+      if (i === n - 1) {
+        const more = lItems.length > rItems.length ? lItems : rItems;
+        if (more[n]) more[n].classList.add('alone');
+        if (done) setTimeout(done, 500);
+      }
+    }, i * 260);
+  }
+}
 function newRound() {
   locked = false;
+  leftDone = false;
+  rightDone = false;
+  phase = 'countL';
   round++;
   if (round > TOTAL) {
-    showWin('你收集了 ' + starN + ' 顆星星！', start);
+    showWin('你會先數再比大小了！共 ' + starN + ' 顆星星！', start);
     return;
   }
   const fruit = pick(['🍎', '🍓', '🍊', '🍇', '🍌']);
@@ -67,49 +174,51 @@ function newRound() {
   do {
     leftN = randInt(lo, hi);
     rightN = randInt(lo, hi);
-  } while (leftN === rightN);
+  } while (leftN === rightN || (mode === 2 && Math.abs(leftN - rightN) < 2));
+  lastLeft = leftN; lastRight = rightN;
   fillSide(document.getElementById('leftItems'), leftN, fruit);
   fillSide(document.getElementById('rightItems'), rightN, fruit);
-  document.getElementById('left').className = 'cmp-side cmp-left';
-  document.getElementById('right').className = 'cmp-side cmp-right';
-  document.getElementById('numL').textContent = leftN;
-  document.getElementById('numR').textContent = rightN;
+  const wl = document.getElementById('writeL');
+  const wr = document.getElementById('writeR');
+  wl.textContent = '?'; wr.textContent = '?';
+  wl.className = 'cmp-write active';
+  wr.className = 'cmp-write';
+  document.getElementById('cmpSvg').innerHTML = '';
+  document.getElementById('cmpTools').innerHTML = '';
+  buildPad();
   const fb = document.getElementById('fb');
   fb.textContent = '';
   fb.className = 'feedback';
-  document.getElementById('hint').innerHTML = '第 ' + round + ' / ' + TOTAL + ' 題：哪一邊<span style="color:#ff5f6f">比較多</span>？';
-  Voice.speak('哪一邊比較多？點點看！');
+  document.getElementById('hint').innerHTML = '第 ' + round + ' / ' + TOTAL + ' 題：<span style="color:#ff5f6f">左邊</span>有幾個？點數字寫下來！';
+  Voice.speak('第' + numToCN(round) + '題！先數一數，左邊有幾個？點數字寫下來！');
 }
 function choose(side, n, el) {
-  if (locked) return;
+  if (locked || phase !== 'choose') return;
   const other = side === 'left' ? rightN : leftN;
   const fb = document.getElementById('fb');
   if (n > other) {
     locked = true;
     el.classList.add('cmp-ok');
+    const mark = document.createElement('div');
+    mark.className = 'cmp-check';
+    mark.textContent = '✓';
+    el.appendChild(mark);
     Sfx.good();
-    addStar(1);
-    const box = document.querySelector('#' + side + 'Items');
-    box.querySelectorAll('.cmp-item').forEach((it, i) => setTimeout(() => {
-      it.classList.add('tagged');
-      it.querySelector('.ctag').textContent = i + 1;
-    }, i * 110));
-    fb.textContent = '答對了！' + (side === 'left' ? '左邊' : '右邊') + '比較多！';
-    fb.className = 'feedback good';
-    Voice.speak('答對了！' + (side === 'left' ? '左邊' : '右邊') + '比較多！');
-    confetti(24);
-    setTimeout(newRound, 2000);
+    addStar(2);
+    drawPairing(() => {
+      confetti(26);
+      fb.textContent = '答對了！' + (side === 'left' ? '左邊' : '右邊') + '比較多，打 ✓！';
+      fb.className = 'feedback good';
+      Voice.speak('答對了！' + (side === 'left' ? '左邊' : '右邊') + '比較多！');
+    });
+    setTimeout(newRound, 3000);
   } else {
     Sfx.bad();
     showCross(...elCenter(el));
-    el.classList.add('cmp-bad');
     shake(el);
-    fb.textContent = '再想一想，可以再點一次！';
+    fb.textContent = '再比比看！兩個數字哪個大？';
     fb.className = 'feedback badf';
-    Voice.speak('比比看數字，哪個比較大？再試一次！');
-    setTimeout(() => {
-      el.classList.remove('cmp-bad');
-    }, 900);
+    Voice.speak('再比比看，' + numToCN(leftN) + '和' + numToCN(rightN) + '，哪個比較大？');
   }
 }
 function start() {
