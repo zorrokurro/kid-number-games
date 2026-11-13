@@ -4,14 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>數數問答站 | 數字樂園</title>
-<link rel="stylesheet" href="../css/style.css?v=9">
+<link rel="stylesheet" href="../css/style.css?v=10">
 </head>
 <body class="theme-quiz">
 <div class="page">
-  <div class="pick" id="modePick">
-    <button class="btn green" id="m1">🌱 輕鬆模式（不限時）</button>
-    <button class="btn purple" id="m2">🔥 限時挑戰（每題 15 秒）</button>
-  </div>
   <div class="panel">
     <div class="hint" id="hint"></div>
     <div class="quiz-stage">
@@ -23,9 +19,9 @@
     <div class="feedback" id="fb"></div>
   </div>
 </div>
-<script src="../js/common.js?v=9"></script>
+<script src="../js/common.js?v=10"></script>
 <script>
-const INSTR = '看圖數一數！題目問什麼就數什麼，在三個數字裡挑出正確答案！限時模式要動作快唷！';
+const INSTR = '看圖數一數！慢慢數不用急，在三個數字裡挑出正確答案！';
 const SCENES = [
   {
     name: '海底', bg: 'linear-gradient(180deg,#7ec8f7 0%,#b8ecf7 70%,#ffe9b8 100%)',
@@ -122,7 +118,7 @@ const SCENES = [
     ]
   }
 ];
-let mode = 1;       // 1=輕鬆 2=限時
+let mode = 1;       // 1=輕鬆 2=限時（此檔固定輕鬆）
 let round = 0;
 const TOTAL = 10;
 let targetN = 0;
@@ -170,25 +166,25 @@ function newRound() {
     card.appendChild(d);
   });
   const total = targetN + disN;
-  const cols = Math.ceil(Math.sqrt(total * 2.2));
-  const rows = Math.ceil(total / cols);
+  const cols = 5, rows = 3;
   const cells = shuffle(Array.from({ length: cols * rows }, (_, i) => i)).slice(0, total);
   const mk = (emoji, isTarget) => {
     const s = document.createElement('span');
     s.className = 'q-item' + (scene.dark ? ' q-dark' : '');
     s.textContent = pick(emoji);
-    s.style.fontSize = randInt(40, 56) + 'px';
-    s.style.transform = 'rotate(' + randInt(-16, 16) + 'deg) ' + (Math.random() < .5 ? 'scaleX(-1)' : '');
+    s.style.fontSize = randInt(38, 50) + 'px';
+    s.style.transform = 'rotate(' + randInt(-14, 14) + 'deg) ' + (Math.random() < .5 ? 'scaleX(-1)' : '');
     return s;
   };
   const targets = Array.from({ length: targetN }, () => mk(tg.emoji, true));
   const dis = Array.from({ length: disN }, () => mk(pick(dg).emoji, false));
   shuffle(targets.concat(dis)).forEach((s, i) => {
     const cell = cells[i];
-    const cx = (cell % cols + .5) / cols * 100;
-    const cy = (Math.floor(cell / cols) + .5) / rows * 100;
-    s.style.left = 'calc(' + cx + '% - 24px)';
-    s.style.top = 'calc(' + cy + '% - 28px)';
+    const jx = randInt(-6, 6), jy = randInt(-5, 5);
+    const cx = (cell % cols + .5) / cols * 100 + jx;
+    const cy = (Math.floor(cell / cols) + .5) / rows * 100 + jy;
+    s.style.left = 'calc(' + cx + '% - 25px)';
+    s.style.top = 'calc(' + cy + '% - 27px)';
     card.appendChild(s);
   });
   // 三個選項
@@ -289,9 +285,8 @@ function start() {
   document.getElementById('qFill').style.width = '0%';
   newRound();
 }
-document.getElementById('m1').addEventListener('click', () => { Sfx.click(); mode = 1; document.getElementById('modePick').classList.add('hide'); start(); });
-document.getElementById('m2').addEventListener('click', () => { Sfx.click(); mode = 2; document.getElementById('modePick').classList.add('hide'); start(); });
 buildHeader('🧮 數數問答站', INSTR);
+start();
 </script>
 </body>
 </html>

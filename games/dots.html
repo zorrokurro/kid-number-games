@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>連連看 | 數字樂園</title>
-<link rel="stylesheet" href="../css/style.css?v=9">
+<link rel="stylesheet" href="../css/style.css?v=10">
 </head>
 <body>
 <div class="page">
@@ -19,7 +19,7 @@
     <div class="next-pill" id="nextPill">下一個數字：1</div>
   </div>
 </div>
-<script src="../js/common.js?v=9"></script>
+<script src="../js/common.js?v=10"></script>
 <script>
 const INSTR = '從數字 1 開始，照著 1、2、3 的順序點點點，連出可愛的圖案！也可以挑戰 11 到 20 唷！';
 const PICTURES = [
@@ -134,6 +134,31 @@ function drawPicture() {
     '<g id="revealG" style="display:none">' + p.reveal + '</g>';
   poly = svg.querySelector('#poly');
   revealG = svg.querySelector('#revealG');
+  // 數字標籤防重疊：先用放鬆法把太近的標籤推開
+  const labels = p.pts.map(pt => ({ x: pt[0], y: pt[1] + 9 }));
+  const MIN = 48;
+  for (let it = 0; it < 80; it++) {
+    let moved = false;
+    for (let a = 0; a < labels.length; a++) {
+      for (let b = a + 1; b < labels.length; b++) {
+        const dx = labels[b].x - labels[a].x;
+        const dy = labels[b].y - labels[a].y;
+        const d = Math.hypot(dx, dy) || 0.01;
+        if (d < MIN) {
+          const push = (MIN - d) / 2;
+          const ux = dx / d, uy = dy / d;
+          labels[a].x -= ux * push; labels[a].y -= uy * push;
+          labels[b].x += ux * push; labels[b].y += uy * push;
+          moved = true;
+        }
+      }
+    }
+    if (!moved) break;
+  }
+  labels.forEach(l => {
+    l.x = Math.min(676, Math.max(24, l.x));
+    l.y = Math.min(468, Math.max(22, l.y));
+  });
   p.pts.forEach((pt, i) => {
     const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     g.classList.add('dot-g');
@@ -143,8 +168,8 @@ function drawPicture() {
     c.setAttribute('cy', pt[1]);
     c.setAttribute('r', 25);
     const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    t.setAttribute('x', pt[0]);
-    t.setAttribute('y', pt[1] + 9);
+    t.setAttribute('x', labels[i].x);
+    t.setAttribute('y', labels[i].y);
     t.textContent = base + i + 1;
     g.appendChild(c);
     g.appendChild(t);

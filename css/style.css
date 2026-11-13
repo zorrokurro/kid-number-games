@@ -388,7 +388,7 @@ body::after {
 .dot-g { cursor: pointer; }
 .dot-g circle { fill: #fff; stroke: #ff8f3c; stroke-width: 4; transition: transform .15s; transform-box: fill-box; transform-origin: center; }
 .dot-g:hover circle { transform: scale(1.25); fill: #fff3d6; }
-.dot-g text { font-size: 26px; font-weight: 900; fill: #5a4b8a; text-anchor: middle; pointer-events: none; }
+.dot-g text { font-size: 22px; font-weight: 900; fill: #5a4b8a; text-anchor: middle; pointer-events: none; paint-order: stroke; stroke: #fff; stroke-width: 5px; stroke-linejoin: round; }
 .dot-g.done circle { fill: #43d19e; stroke: #2c9b72; }
 .dot-g.done text { fill: #fff; }
 .next-pill {
