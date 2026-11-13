@@ -126,6 +126,8 @@ let mode = 1;       // 1=輕鬆 2=限時
 let round = 0;
 const TOTAL = 10;
 let targetN = 0;
+let curMw = '個';
+let curName = '';
 let timerId = null;
 let timeLeft = 0;
 let locked = false;
@@ -148,6 +150,8 @@ function newRound() {
   // 從場景的 groups 中挑題目組，其餘當干擾
   const gi = randInt(0, scene.groups.length - 1);
   const tg = scene.groups[gi];
+  curMw = tg.mw;
+  curName = tg.name;
   const dg = scene.groups.filter((_, i) => i !== gi);
   targetN = randInt(2, 9);
   const disN = randInt(2, 5);
@@ -251,9 +255,9 @@ function choose(btn, v) {
     Sfx.good();
     addStar(1);
     confetti(26);
-    fb.textContent = '答對了！有 ' + targetN + ' 個！';
+    fb.textContent = '答對了！有 ' + targetN + ' ' + curMw + curName + '！';
     fb.className = 'feedback good';
-    Voice.speak('答對了！有' + numToCN(targetN) + '個，好棒！');
+    Voice.speak('答對了！有' + numToCN(targetN) + curMw + curName + '，好棒！');
     setTimeout(newRound, 1900);
   } else {
     Sfx.bad();
@@ -270,7 +274,7 @@ function timeUp(tg) {
   const hit = [...document.querySelectorAll('.quiz-opt')].find(b => parseInt(b.textContent) === targetN);
   if (hit) hit.classList.add('reveal');
   const fb = document.getElementById('fb');
-  fb.textContent = '⏰ 時間到！答案是 ' + targetN + '！';
+  fb.textContent = '⏰ 時間到！答案是 ' + targetN + ' ' + curMw + curName + '！';
   fb.className = 'feedback badf';
   Voice.speak('時間到！答案是' + numToCN(targetN) + '！下一題加油！');
   setTimeout(newRound, 2200);
