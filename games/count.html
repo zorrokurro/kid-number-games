@@ -4,10 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>數一數 | 數字樂園</title>
-<link rel="stylesheet" href="../css/style.css?v=6">
+<link rel="stylesheet" href="../css/style.css?v=7">
 </head>
 <body>
 <div class="page">
+  <div class="pick" id="modePick">
+    <button class="btn green" id="m1">🌱 1~10</button>
+    <button class="btn purple" id="m2">🔥 11~20</button>
+  </div>
   <div class="panel">
     <div class="hint" id="hint">數一數有幾隻小魚？</div>
     <div class="fish-box" id="fishBox"></div>
@@ -15,9 +19,10 @@
     <div class="feedback" id="fb"></div>
   </div>
 </div>
-<script src="../js/common.js?v=6"></script>
+<script src="../js/common.js?v=7"></script>
 <script>
 const INSTR = '數一數，有幾隻小魚？點下面的正確答案！也可以點小魚幫忙數唷。';
+let mode = 1;
 let round = 0;
 const TOTAL = 10;
 let lastN = 0;
@@ -47,11 +52,13 @@ function buildFishes(n) {
 function buildAnswers(n) {
   const row = document.getElementById('ansRow');
   row.innerHTML = '';
-  const opts = shuffle([n, ...wrongNums(n, 1, 10, 2)]);
+  const opts = mode === 1
+    ? shuffle([n, ...wrongNums(n, 1, 10, 2)])
+    : shuffle([n, ...wrongNums(n, 11, 20, 2)]);
   opts.forEach((v, i) => {
     const b = document.createElement('button');
     b.className = 'num-btn nb' + (i + 1);
-    b.innerHTML = v + '<small>' + CN_NUM[v] + '</small>';
+    b.innerHTML = v + '<small>' + numToCN(v) + '</small>';
     b.dataset.v = v;
     b.addEventListener('click', () => choose(b, v));
     row.appendChild(b);
@@ -72,9 +79,9 @@ function choose(btn, v) {
       t.textContent = i + 1;
       t.style.display = 'flex';
     }, i * 180));
-    fb.textContent = '答對了！' + CN_NUM[n] + '隻小魚！';
+    fb.textContent = '答對了！' + numToCN(n) + '隻小魚！';
     fb.className = 'feedback good';
-    Voice.speak('答對了！有' + CN_NUM[n] + '隻小魚，好棒！');
+    Voice.speak('答對了！有' + numToCN(n) + '隻小魚，好棒！');
     confetti(24);
     setTimeout(next, 1800);
   } else {
@@ -99,9 +106,10 @@ function next() {
     showWin('你收集了 ' + starN + ' 顆星星！', start);
     return;
   }
-  let n = randInt(1, 10);
-  while (n === lastN) n = randInt(1, 10);
+  let n = mode === 1 ? randInt(1, 10) : randInt(11, 20);
+  while (n === lastN) n = mode === 1 ? randInt(1, 10) : randInt(11, 20);
   lastN = n;
+  document.getElementById('fishBox').classList.toggle('dense', mode === 2);
   document.getElementById('hint').innerHTML = '第 ' + round + ' / ' + TOTAL + ' 題：數一數有幾隻小魚？';
   buildFishes(n);
   buildAnswers(n);
@@ -119,7 +127,8 @@ function start() {
   next();
 }
 buildHeader('🐠 數一數', INSTR);
-start();
+document.getElementById('m1').addEventListener('click', () => { Sfx.click(); mode = 1; document.getElementById('modePick').classList.add('hide'); start(); });
+document.getElementById('m2').addEventListener('click', () => { Sfx.click(); mode = 2; document.getElementById('modePick').classList.add('hide'); start(); });
 </script>
 </body>
 </html>

@@ -762,3 +762,43 @@ body::after {
   background: #ff6b9d; color: #fff; font-size: 15px; font-weight: 900;
   border-radius: 999px; padding: 0 7px; border: 2px solid #fff;
 }
+
+/* ===== compare item tags ===== */
+.cmp-item { position: relative; }
+.cmp-item .ctag {
+  display: none; position: absolute; top: -12px; right: -10px;
+  background: #ffc63c; color: #fff; font-size: 18px; font-weight: 900;
+  font-style: normal; width: 32px; height: 32px; border-radius: 50%;
+  align-items: center; justify-content: center;
+  border: 3px solid #fff; box-shadow: 0 2px 5px rgba(0,0,0,.25); z-index: 2;
+}
+.cmp-item.tagged .ctag { display: flex; }
+.cmp-box.dense .cmp-item { font-size: 30px; }
+.cmp-box.dense .cmp-item .ctag { width: 26px; height: 26px; font-size: 15px; top: -8px; right: -6px; }
+.cmp-box.dense .cmp-items { min-height: 300px; }
+
+/* ===== garden treasure ===== */
+.garden-box {
+  min-height: 250px;
+  background: linear-gradient(180deg, #eaf8d8 0%, #c2e8a8 100%);
+  border: 4px solid #bfe0a0; border-radius: 24px;
+  display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-end;
+  gap: 18px; padding: 34px 14px 18px;
+  box-shadow: inset 0 -12px 0 rgba(255,255,255,.35);
+}
+.garden-box .fish { font-size: 54px; }
+.garden-box.dense .fish { font-size: 40px; }
+.garden-box.dense { gap: 10px; }
+
+/* ===== count 11-20 dense ===== */
+.fish-box.dense .fish { font-size: 46px; }
+.fish-box.dense { gap: 14px; }
+
+/* ===== ladybug dense (11-20) ===== */
+.lb.dense .lb-spot { width: 15px; height: 15px; }
+
+/* ===== harvest dense (11-20) ===== */
+.field.dense .crop { font-size: 38px; }
+.basket-strip.dense { gap: 4px; }
+.basket-strip.dense .strip-c { font-size: 24px; }
+.basket-strip.dense .strip-c b { font-size: 12px; top: -6px; right: -9px; padding: 0 5px; }

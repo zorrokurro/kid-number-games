@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>記憶配對 | 數字樂園</title>
-<link rel="stylesheet" href="../css/style.css?v=6">
+<link rel="stylesheet" href="../css/style.css?v=7">
 </head>
 <body>
 <div class="page">
@@ -21,10 +21,11 @@
     <div class="row">
       <button class="btn green" data-m="1">🌱 簡單（3 對，1~5）</button>
       <button class="btn purple" data-m="2">🔥 進階（4 對，1~10）</button>
+      <button class="btn orange" data-m="3">🚀 挑戰（4 對，11~20）</button>
     </div>
   </div>
 </div>
-<script src="../js/common.js?v=6"></script>
+<script src="../js/common.js?v=7"></script>
 <script>
 const INSTR = '翻翻卡片，找出數字和點點一樣多的那一對！';
 let mode = 1;
@@ -35,6 +36,7 @@ let lock = false;
 
 function pickNums() {
   if (mode === 1) return shuffle([1, 2, 3, 4, 5]).slice(0, 3);
+  if (mode === 3) return shuffle([11, 12, 13, 14, 15, 16, 17, 18, 19, 20]).slice(0, 4);
   return shuffle([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]).slice(0, 4);
 }
 function safeShuffle(items) {
@@ -84,6 +86,11 @@ function mkCard(kind, num) {
   if (kind === 'num') {
     front.textContent = num;
     front.style.color = '#ff5f6f';
+  } else if (kind === 'word') {
+    front.textContent = numToCN(num);
+    front.style.color = '#5a4b8a';
+    front.style.fontSize = '36px';
+    front.style.lineHeight = '1.3';
   } else {
     const box = document.createElement('div');
     box.className = 'dots-in';
@@ -133,7 +140,7 @@ function flip(c, kind, num) {
       Sfx.bad();
       showCross(...elCenter(b.c));
       if (a.kind === b.kind && a.num === b.num) {
-        Voice.speak('要一張數字、一張點點喔！');
+        Voice.speak(mode === 3 ? '要一張數字、一張中文喔！' : '要一張數字、一張點點喔！');
       }
       setTimeout(() => {
         a.c.classList.remove('open');
@@ -148,7 +155,7 @@ function buildBoard(nums) {
   openCards = [];
   lock = false;
   const items = [];
-  nums.forEach(n => { items.push(['num', n], ['dots', n]); });
+  nums.forEach(n => { items.push(['num', n], [mode === 3 ? 'word' : 'dots', n]); });
   const grid = document.getElementById('grid');
   grid.className = mode === 1 ? 'grid3' : 'grid4';
   grid.innerHTML = '';
@@ -187,9 +194,9 @@ document.querySelectorAll('#pickMask button').forEach(btn => {
     lock = false;
     document.getElementById('pickMask').classList.remove('show');
     Sfx.click();
-    document.getElementById('hint').textContent = '翻翻卡片，把數字和一樣多的點點配對！';
+    document.getElementById('hint').textContent = mode === 3 ? '翻翻卡片，把數字和一樣的中文配對！' : '翻翻卡片，把數字和一樣多的點點配對！';
     buildBoard(pickNums());
-    Voice.speak('翻翻卡片，找出數字和點點一樣多的那一對！');
+    Voice.speak(mode === 3 ? '翻翻卡片，找出數字和中文一樣的那一對！' : '翻翻卡片，找出數字和點點一樣多的那一對！');
   });
 });
 buildHeader('🃏 記憶配對', INSTR);

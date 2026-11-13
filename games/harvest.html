@@ -4,10 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>收蔬菜 | 數字樂園</title>
-<link rel="stylesheet" href="../css/style.css?v=6">
+<link rel="stylesheet" href="../css/style.css?v=7">
 </head>
 <body>
 <div class="page">
+  <div class="pick" id="modePick">
+    <button class="btn green" id="m1">🌱 1~10</button>
+    <button class="btn purple" id="m2">🔥 11~20</button>
+  </div>
   <div class="panel">
     <div class="hint" id="hint"></div>
     <div class="field" id="field"></div>
@@ -19,10 +23,11 @@
     <div class="feedback" id="fb"></div>
   </div>
 </div>
-<script src="../js/common.js?v=6"></script>
+<script src="../js/common.js?v=7"></script>
 <script>
-const INSTR = '把菜園裡的蔬菜全部採收起來！一邊採一邊大聲數，再告訴農夫一共採了幾個！';
+const INSTR = '把菜園裡的蔬菜全部採收起來！一邊採一邊大聲數，再告訴農夫一共採了幾個！可以選 1~10 或挑戰 11~20！';
 const VEG = [['紅蘿蔔', '🥕'], ['番茄', '🍅'], ['玉米', '🌽'], ['茄子', '🍆'], ['馬鈴薯', '🥔'], ['草莓', '🍓']];
+let mode = 1;
 let round = 0;
 const TOTAL = 8;
 let targetN = 0, vegName = '', picked = 0, locked = false;
@@ -38,7 +43,9 @@ function newRound() {
   const kind = pick(VEG);
   vegName = kind[0];
   const emoji = kind[1];
-  targetN = randInt(4, 9);
+  targetN = mode === 1 ? randInt(4, 9) : randInt(11, 20);
+  document.getElementById('field').classList.toggle('dense', mode === 2);
+  document.getElementById('strip').classList.toggle('dense', mode === 2);
   document.getElementById('strip').innerHTML = '';
   document.getElementById('ansRow').style.display = 'none';
   document.getElementById('ansRow').innerHTML = '';
@@ -79,7 +86,7 @@ function pickCrop(c, ev) {
       locked = false;
       const row = document.getElementById('ansRow');
       row.innerHTML = '';
-      shuffle([targetN, ...wrongNums(targetN, 1, 10, 2)]).forEach(v => {
+      shuffle([targetN, ...wrongNums(targetN, 1, 20, 2)]).forEach(v => {
         const b = document.createElement('button');
         b.className = 'num-btn nb' + (row.children.length + 1);
         b.innerHTML = v + '<small>' + numToCN(v) + '</small>';
@@ -128,7 +135,8 @@ function start() {
   newRound();
 }
 buildHeader('🥕 收蔬菜', INSTR);
-start();
+document.getElementById('m1').addEventListener('click', () => { Sfx.click(); mode = 1; document.getElementById('modePick').classList.add('hide'); start(); });
+document.getElementById('m2').addEventListener('click', () => { Sfx.click(); mode = 2; document.getElementById('modePick').classList.add('hide'); start(); });
 </script>
 </body>
 </html>

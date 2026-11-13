@@ -4,20 +4,27 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>瓢蟲點點 | 數字樂園</title>
-<link rel="stylesheet" href="../css/style.css?v=6">
+<link rel="stylesheet" href="../css/style.css?v=7">
 </head>
 <body>
 <div class="page">
+  <div class="pick" id="modePick">
+    <button class="btn green" id="m1">🌱 1~10</button>
+    <button class="btn purple" id="m2">🔥 11~20</button>
+  </div>
   <div class="panel">
     <div class="hint" id="hint"></div>
     <div class="lb-row" id="lbRow"></div>
     <div class="feedback" id="fb"></div>
   </div>
 </div>
-<script src="../js/common.js?v=6"></script>
+<script src="../js/common.js?v=7"></script>
 <script>
-const INSTR = '找一找，哪一隻瓢蟲身上的點點跟題目一樣多？點點看！';
+const INSTR = '找一找，哪一隻瓢蟲身上的點點跟題目一樣多？點點看！可以選 1~10 或挑戰 11~20！';
 const SLOTS = [[30, 25], [68, 25], [20, 45], [50, 40], [80, 45], [26, 65], [50, 58], [74, 65], [40, 82], [62, 82]];
+const GRID20 = [];
+[15, 32, 50, 68, 84].forEach(y => [24, 41, 59, 76].forEach(x => GRID20.push([x, y])));
+let mode = 1;
 let round = 0;
 const TOTAL = 8;
 let targetN = 0, locked = false;
@@ -28,7 +35,10 @@ function buildLadybug(k) {
   lb.innerHTML = '<span class="lb-head"><i class="eye l"></i><i class="eye r"></i></span>' +
     '<span class="lb-body"><span class="lb-line"></span></span>';
   const body = lb.querySelector('.lb-body');
-  shuffle(SLOTS).slice(0, k).forEach(p => {
+  const useGrid = k > 10;
+  if (useGrid) lb.classList.add('dense');
+  const src = useGrid ? GRID20 : SLOTS;
+  shuffle(src).slice(0, k).forEach(p => {
     const s = document.createElement('i');
     s.className = 'lb-spot';
     s.style.left = p[0] + '%';
@@ -45,10 +55,12 @@ function newRound() {
     showWin('你找到所有瓢蟲了！共 ' + starN + ' 顆星星！', start);
     return;
   }
-  targetN = randInt(2, 10);
+  targetN = mode === 1 ? randInt(2, 10) : randInt(11, 20);
   const row = document.getElementById('lbRow');
   row.innerHTML = '';
-  const opts = shuffle([targetN, ...wrongNums(targetN, 1, 10, 2)]);
+  const opts = mode === 1
+    ? shuffle([targetN, ...wrongNums(targetN, 1, 10, 2)])
+    : shuffle([targetN, ...wrongNums(targetN, 11, 20, 2)]);
   opts.forEach(k => row.appendChild(buildLadybug(k)));
   document.getElementById('hint').innerHTML = '第 ' + round + ' / ' + TOTAL + ' 題：哪一隻瓢蟲有 <span class="num">' + targetN + '</span> 個點點？';
   const fb = document.getElementById('fb');
@@ -89,7 +101,8 @@ function start() {
   newRound();
 }
 buildHeader('🐞 瓢蟲點點', INSTR);
-start();
+document.getElementById('m1').addEventListener('click', () => { Sfx.click(); mode = 1; document.getElementById('modePick').classList.add('hide'); start(); });
+document.getElementById('m2').addEventListener('click', () => { Sfx.click(); mode = 2; document.getElementById('modePick').classList.add('hide'); start(); });
 </script>
 </body>
 </html>

@@ -4,10 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>數數氣球 | 數字樂園</title>
-<link rel="stylesheet" href="../css/style.css?v=6">
+<link rel="stylesheet" href="../css/style.css?v=7">
 </head>
 <body>
 <div class="page">
+  <div class="pick" id="modePick">
+    <button class="btn green" id="m1">🌱 1~10</button>
+    <button class="btn purple" id="m2">🔥 11~20</button>
+  </div>
   <div class="panel">
     <div class="hint" id="hint"></div>
     <div class="sky" id="sky" style="height: 440px;">
@@ -17,21 +21,31 @@
     <div class="feedback" id="fb"></div>
   </div>
 </div>
-<script src="../js/common.js?v=6"></script>
+<script src="../js/common.js?v=7"></script>
 <script>
-const INSTR = '照 1、2、3 的順序點爆氣球，大聲跟著數！';
-const ROUNDS = [5, 6, 7, 8, 9, 10];
+const INSTR = '照順序點爆氣球，大聲跟著數！可以選 1 到 10，或挑戰 11 到 20！';
+const ROUNDS1 = [5, 6, 7, 8, 9, 10];
+const ROUNDS2 = [[11, 15], [16, 20], [11, 20]];
+let mode = 1;
 let roundIdx = 0;
 let next = 1;
-let total = 0;
+let from = 1;
+let to = 5;
 let locked = false;
 
-function buildRound(n) {
-  next = 1;
+function roundCfg(i) {
+  if (mode === 1) return { f: 1, t: ROUNDS1[i] };
+  return { f: ROUNDS2[i][0], t: ROUNDS2[i][1] };
+}
+function buildRound() {
+  const cfg = roundCfg(roundIdx);
+  from = cfg.f;
+  to = cfg.t;
+  next = from;
   const row = document.getElementById('row');
   row.innerHTML = '';
   const colors = shuffle(BCOLORS.slice());
-  shuffle(Array.from({ length: n }, (_, i) => i + 1)).forEach((num, i) => {
+  shuffle(Array.from({ length: to - from + 1 }, (_, i) => from + i)).forEach((num, i) => {
     const b = document.createElement('div');
     b.className = 'balloon count-b';
     b.textContent = num;
@@ -45,11 +59,11 @@ function buildRound(n) {
   const fb = document.getElementById('fb');
   fb.textContent = '';
   fb.className = 'feedback';
-  Voice.speak('我們來數到' + CN_NUM[n] + '！先點數字一！');
+  Voice.speak('我們從' + numToCN(from) + '數到' + numToCN(to) + '！先點' + numToCN(from) + '！');
 }
 function updateHint() {
   document.getElementById('hint').innerHTML =
-    '第 ' + (roundIdx + 1) + ' / ' + ROUNDS.length + ' 輪：照順序點 <span class="num">' + next + '</span> （已數到 ' + (next - 1) + '）';
+    '第 ' + (roundIdx + 1) + ' / ' + (mode === 1 ? ROUNDS1.length : ROUNDS2.length) + ' 輪：照順序點 <span class="num">' + next + '</span>（已數到 ' + (next - 1) + '）';
 }
 function clickB(b, num) {
   if (locked || b.classList.contains('popped')) return;
@@ -62,31 +76,30 @@ function clickB(b, num) {
     const fb = document.getElementById('fb');
     fb.textContent = '先點數字 ' + next + ' 的氣球！';
     fb.className = 'feedback badf';
-    Voice.speak('先點數字' + CN_NUM[next] + '的氣球！');
+    Voice.speak('先點數字' + numToCN(next) + '的氣球！');
     return;
   }
   Sfx.pop();
   b.classList.add('popped');
   const fb = document.getElementById('fb');
-  fb.textContent = '✨ ' + CN_NUM[num] + '！數對了！';
+  fb.textContent = '✨ ' + numToCN(num) + '！數對了！';
   fb.className = 'feedback good';
-  Voice.speak(CN_NUM[num] + '！');
+  Voice.speak(numToCN(num) + '！');
   addStar(1);
   burst.call(null, ...pos(b));
-  total = num;
-  if (next === ROUNDS[roundIdx]) {
+  if (next === to) {
     locked = true;
     confetti(40);
     Sfx.good();
     setTimeout(() => {
       locked = false;
       roundIdx++;
-      if (roundIdx >= ROUNDS.length) {
-        showWin('你會數到十了！共 ' + starN + ' 顆星星！', start);
+      const totalRounds = mode === 1 ? ROUNDS1.length : ROUNDS2.length;
+      if (roundIdx >= totalRounds) {
+        showWin(mode === 1 ? '你會數到十了！' : '你會數到二十了！共 ' + starN + ' 顆星星！', start);
         return;
       }
-      Voice.speak(CN_NUM[ROUNDS[roundIdx - 1]] + '個氣球，好棒！下一輪！');
-      buildRound(ROUNDS[roundIdx]);
+      buildRound();
     }, 1800);
   } else {
     next++;
@@ -103,10 +116,11 @@ function start() {
   if (e) e.textContent = '0';
   roundIdx = 0;
   locked = false;
-  buildRound(ROUNDS[0]);
+  buildRound();
 }
+document.getElementById('m1').addEventListener('click', () => { Sfx.click(); mode = 1; document.getElementById('modePick').classList.add('hide'); start(); });
+document.getElementById('m2').addEventListener('click', () => { Sfx.click(); mode = 2; document.getElementById('modePick').classList.add('hide'); start(); });
 buildHeader('🎈 數數氣球', INSTR);
-start();
 </script>
 </body>
 </html>

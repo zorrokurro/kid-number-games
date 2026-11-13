@@ -4,10 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>跳跳數數 | 數字樂園</title>
-<link rel="stylesheet" href="../css/style.css?v=6">
+<link rel="stylesheet" href="../css/style.css?v=7">
 </head>
 <body>
 <div class="page">
+  <div class="pick" id="modePick">
+    <button class="btn green" id="m1">🌱 有提示</button>
+    <button class="btn purple" id="m2">🔥 沒提示挑戰</button>
+  </div>
   <div class="panel">
     <div class="hint" id="hint"></div>
     <div class="hop-track" id="track">
@@ -16,13 +20,14 @@
     <div class="feedback" id="fb"></div>
   </div>
 </div>
-<script src="../js/common.js?v=6"></script>
+<script src="../js/common.js?v=7"></script>
 <script>
-const INSTR = '小青蛙要跳格子！照 1、2、3 的順序點數字，跳完十格就過關，一路跳到一百！';
+const INSTR = '小青蛙要跳格子！照 1、2、3 的順序點數字，跳完十格就過關，一路跳到一百！也可以挑戰沒有提示的版本！';
 let level = 0;
 let next = 1;
 let base = 1;
 let locked = false;
+let hintOn = true;
 
 function buildLevel() {
   base = level * 10;
@@ -41,11 +46,15 @@ function buildLevel() {
   });
   const frog = document.getElementById('frog');
   frog.style.left = '20px';
-  document.getElementById('hint').innerHTML = '第 ' + (level + 1) + ' / 10 關：照順序點 <span class="num">' + next + '</span>！';
+  document.getElementById('hint').innerHTML = hintOn
+    ? '第 ' + (level + 1) + ' / 10 關：照順序點 <span class="num">' + next + '</span>！'
+    : '第 ' + (level + 1) + ' / 10 關：自己想想，下一個數字是幾？🤔';
   const fb = document.getElementById('fb');
   fb.textContent = '';
   fb.className = 'feedback';
-  Voice.speak('我們從數字' + numToCN(base + 1) + '跳到' + numToCN(base + 10) + '！先點' + numToCN(base + 1) + '！');
+  Voice.speak(hintOn
+    ? '我們從數字' + numToCN(base + 1) + '跳到' + numToCN(base + 10) + '！先點' + numToCN(base + 1) + '！'
+    : '我們從數字' + numToCN(base + 1) + '跳到' + numToCN(base + 10) + '！自己找順序唷！');
 }
 function clickStone(s, n, ev) {
   if (locked || s.classList.contains('done')) return;
@@ -56,9 +65,15 @@ function clickStone(s, n, ev) {
     void s.offsetWidth;
     s.classList.add('wiggle');
     const fb = document.getElementById('fb');
-    fb.textContent = '先點數字 ' + next + ' 喔！';
-    fb.className = 'feedback badf';
-    Voice.speak('下一個是' + numToCN(next) + '喔！');
+    if (hintOn) {
+      fb.textContent = '先點數字 ' + next + ' 喔！';
+      fb.className = 'feedback badf';
+      Voice.speak('下一個是' + numToCN(next) + '喔！');
+    } else {
+      fb.textContent = '再想想看，順序對嗎？🤔';
+      fb.className = 'feedback badf';
+      Voice.speak('再想想看！');
+    }
     return;
   }
   Sfx.pop();
@@ -88,7 +103,9 @@ function clickStone(s, n, ev) {
       buildLevel();
     }, 2000);
   } else {
-    document.getElementById('hint').innerHTML = '第 ' + (level + 1) + ' / 10 關：照順序點 <span class="num">' + next + '</span>！';
+    document.getElementById('hint').innerHTML = hintOn
+      ? '第 ' + (level + 1) + ' / 10 關：照順序點 <span class="num">' + next + '</span>！'
+      : '第 ' + (level + 1) + ' / 10 關：自己想想，下一個數字是幾？🤔';
   }
 }
 function start() {
@@ -98,8 +115,9 @@ function start() {
   level = 0;
   buildLevel();
 }
+document.getElementById('m1').addEventListener('click', () => { Sfx.click(); hintOn = true; document.getElementById('modePick').classList.add('hide'); start(); });
+document.getElementById('m2').addEventListener('click', () => { Sfx.click(); hintOn = false; document.getElementById('modePick').classList.add('hide'); start(); });
 buildHeader('🐸 跳跳數數', INSTR);
-start();
 </script>
 </body>
 </html>

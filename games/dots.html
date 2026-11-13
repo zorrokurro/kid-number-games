@@ -4,22 +4,27 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>連連看 | 數字樂園</title>
-<link rel="stylesheet" href="../css/style.css?v=6">
+<link rel="stylesheet" href="../css/style.css?v=7">
 </head>
 <body>
 <div class="page">
+  <div class="pick" id="modePick">
+    <button class="btn green" id="m1">🌱 1~10</button>
+    <button class="btn purple" id="m2">🔥 11~20</button>
+    <button class="btn orange" id="m3">🌳 1~20</button>
+  </div>
   <div class="panel dots-wrap">
     <svg class="dots-svg" id="svg" viewBox="0 0 700 480"></svg>
     <div class="feedback" id="fb"></div>
     <div class="next-pill" id="nextPill">下一個數字：1</div>
   </div>
 </div>
-<script src="../js/common.js?v=6"></script>
+<script src="../js/common.js?v=7"></script>
 <script>
-const INSTR = '從數字 1 開始，照著 1、2、3 的順序點點點，連出可愛的圖案！';
+const INSTR = '從數字 1 開始，照著 1、2、3 的順序點點點，連出可愛的圖案！也可以挑戰 11 到 20 唷！';
 const PICTURES = [
   {
-    name: '房子',
+    set: 'a', name: '房子',
     pts: [[350,70],[540,170],[500,195],[500,400],[200,400],[200,195],[160,170]],
     reveal: '<polygon points="350,70 540,170 160,170" fill="#ff6b6b" opacity="0.95"/>' +
       '<rect x="200" y="195" width="300" height="205" fill="#ffe08a" opacity="0.95"/>' +
@@ -28,7 +33,7 @@ const PICTURES = [
       '<rect x="410" y="225" width="60" height="60" fill="#8fd8ff" rx="8" stroke="#fff" stroke-width="5"/>'
   },
   {
-    name: '小魚',
+    set: 'a', name: '小魚',
     pts: [[160,260],[330,140],[470,190],[590,120],[540,260],[590,400],[470,330],[330,360]],
     reveal: '<polygon points="160,260 330,140 470,190 590,120 540,260 590,400 470,330 330,360" fill="#ff9d54" opacity="0.95"/>' +
       '<polygon points="330,140 470,190 470,330 330,360" fill="#ffa64d" opacity="0.95"/>' +
@@ -38,7 +43,7 @@ const PICTURES = [
       '<circle cx="90" cy="120" r="10" fill="none" stroke="#8fd8ff" stroke-width="5"/>'
   },
   {
-    name: '星星',
+    set: 'a', name: '星星',
     pts: [[350,80],[396,187],[512,198],[424,274],[450,388],[350,328],[250,388],[276,274],[188,198],[304,187]],
     reveal: '<polygon points="350,80 512,198 450,388 350,328 250,388 188,198 396,187" fill="#ffd24d" opacity="0.95"/>' +
       '<polygon points="350,80 450,388 350,328 250,388" fill="#ffb63c" opacity="0.95"/>' +
@@ -47,7 +52,37 @@ const PICTURES = [
       '<circle cx="298" cy="258" r="10" fill="#ffb3c1" opacity=".8"/><circle cx="402" cy="258" r="10" fill="#ffb3c1" opacity=".8"/>'
   },
   {
-    name: '火箭',
+    set: 'a', name: '愛心',
+    pts: [[350,190],[280,120],[180,140],[150,240],[220,330],[350,430],[480,330],[550,240],[520,140],[420,120]],
+    reveal: '<polygon points="350,190 280,120 180,140 150,240 220,330 350,430 480,330 550,240 520,140 420,120" fill="#ff6b9d" opacity="0.95"/>' +
+      '<circle cx="230" cy="205" r="16" fill="#fff" opacity=".65"/>' +
+      '<circle cx="275" cy="168" r="9" fill="#fff" opacity=".65"/>'
+  },
+  {
+    set: 'b', name: '花',
+    pts: [[350,95],[400,201],[517,217],[431,296],[453,412],[350,355],[247,412],[269,296],[183,217],[300,201]],
+    reveal: '<polygon points="350,95 400,201 517,217 431,296 453,412 350,355 247,412 269,296 183,217 300,201" fill="#ff8fa3" opacity="0.95"/>' +
+      '<circle cx="350" cy="270" r="36" fill="#ffd24d" stroke="#e8890c" stroke-width="5"/>' +
+      '<circle cx="337" cy="262" r="5" fill="#5a4b8a"/><circle cx="363" cy="262" r="5" fill="#5a4b8a"/>' +
+      '<path d="M335 283 Q350 293 365 283" stroke="#5a4b8a" stroke-width="5" fill="none" stroke-linecap="round"/>'
+  },
+  {
+    set: 'b', name: '蘋果',
+    pts: [[360,95],[450,105],[530,200],[545,300],[470,400],[350,430],[230,400],[155,300],[170,200],[250,105]],
+    reveal: '<polygon points="360,95 450,105 530,200 545,300 470,400 350,430 230,400 155,300 170,200 250,105" fill="#ff6b6b" opacity="0.95"/>' +
+      '<polygon points="362,98 428,52 472,96 402,112" fill="#43a047"/>' +
+      '<circle cx="250" cy="225" r="18" fill="#fff" opacity=".5"/>'
+  },
+  {
+    set: 'b', name: '西瓜',
+    pts: [[350,110],[450,142],[512,227],[512,333],[450,418],[350,450],[250,418],[188,333],[188,227],[250,142]],
+    reveal: '<polygon points="350,110 450,142 512,227 512,333 450,418 350,450 250,418 188,333 188,227 250,142" fill="#57c968" opacity="0.95"/>' +
+      '<path d="M350 115 Q382 280 350 445" stroke="#2f9e44" stroke-width="16" fill="none" stroke-linecap="round"/>' +
+      '<path d="M442 152 Q492 280 442 408" stroke="#2f9e44" stroke-width="13" fill="none" stroke-linecap="round"/>' +
+      '<path d="M258 152 Q208 280 258 408" stroke="#2f9e44" stroke-width="13" fill="none" stroke-linecap="round"/>'
+  },
+  {
+    set: 'c', name: '火箭',
     pts: [[350,40],[395,90],[410,300],[480,360],[470,410],[410,390],[350,430],[290,390],[230,410],[220,360],[290,300],[305,90]],
     reveal: '<polygon points="305,90 395,90 410,300 290,300" fill="#e8ecf5" opacity="0.95"/>' +
       '<polygon points="410,300 480,360 470,410 410,390" fill="#ff5f6f" opacity="0.95"/>' +
@@ -57,7 +92,7 @@ const PICTURES = [
       '<polygon points="320,432 380,432 350,470" fill="#ffc63c" opacity="0.95"/>'
   },
   {
-    name: '蝸牛',
+    set: 'c', name: '蝸牛',
     pts: [[309,290],[330,341],[430,360],[530,341],[551,290],[570,220],[551,150],[530,99],[430,80],[330,99],[309,150],[250,180],[180,240],[170,290],[250,320],[280,380],[340,420],[300,435],[235,410]],
     reveal: '<polygon points="309,290 330,341 430,360 530,341 551,290 570,220 551,150 530,99 430,80 330,99 309,150" fill="#ffb347" opacity="0.95"/>' +
       '<circle cx="430" cy="220" r="58" fill="none" stroke="#e28b2d" stroke-width="7" opacity="0.9"/>' +
@@ -66,7 +101,7 @@ const PICTURES = [
       '<path d="M175 275 Q190 283 205 278" stroke="#5a4b8a" stroke-width="6" fill="none" stroke-linecap="round"/>'
   },
   {
-    name: '蝴蝶',
+    set: 'c', name: '蝴蝶',
     pts: [[350,120],[375,145],[430,110],[530,60],[610,130],[600,230],[470,270],[580,330],[520,420],[420,360],[365,300],[350,430],[335,300],[280,360],[180,420],[120,330],[230,270],[100,230],[90,130],[270,60]],
     reveal: '<polygon points="375,145 430,110 530,60 610,130 600,230 470,270" fill="#b06ef7" opacity="0.92"/>' +
       '<polygon points="365,300 470,270 580,330 520,420 420,360" fill="#ff8fa3" opacity="0.92"/>' +
@@ -79,18 +114,22 @@ const PICTURES = [
       '<path d="M360 105 Q380 70 400 62" stroke="#5a4b8a" stroke-width="5" fill="none" stroke-linecap="round"/>'
   }
 ];
+let mode = 1;
 let picIdx = 0;
 let step = 1;
+let base = 0;
+let list = [];
 let linePts = [];
 let svg, poly, revealG;
 let done = false;
 
 function drawPicture() {
   done = false;
-  step = 1;
+  base = mode === 2 ? 10 : 0;
+  step = base + 1;
   linePts = [];
   svg = document.getElementById('svg');
-  const p = PICTURES[picIdx];
+  const p = list[picIdx];
   svg.innerHTML = '<polyline id="poly" points="" fill="none" stroke="#ff5f6f" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>' +
     '<g id="revealG" style="display:none">' + p.reveal + '</g>';
   poly = svg.querySelector('#poly');
@@ -98,7 +137,7 @@ function drawPicture() {
   p.pts.forEach((pt, i) => {
     const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     g.classList.add('dot-g');
-    g.dataset.n = i + 1;
+    g.dataset.n = base + i + 1;
     const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     c.setAttribute('cx', pt[0]);
     c.setAttribute('cy', pt[1]);
@@ -106,31 +145,31 @@ function drawPicture() {
     const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
     t.setAttribute('x', pt[0]);
     t.setAttribute('y', pt[1] + 9);
-    t.textContent = i + 1;
+    t.textContent = base + i + 1;
     g.appendChild(c);
     g.appendChild(t);
-    g.addEventListener('click', ev => clickDot(g, pt, i + 1, ev));
+    g.addEventListener('click', ev => clickDot(g, pt, base + i + 1, ev));
     svg.appendChild(g);
   });
-  document.getElementById('nextPill').textContent = '下一個數字：1';
+  document.getElementById('nextPill').textContent = '下一個數字：' + step;
   document.getElementById('fb').textContent = '';
   document.getElementById('fb').className = 'feedback';
-  Voice.speak('我們來連' + p.name + '！先點數字 1！');
+  Voice.speak('我們來連' + p.name + '！先點數字' + numToCN(step) + '！');
 }
 function clickDot(g, pt, n, ev) {
   if (done) return;
   if (n !== step) {
     Sfx.bad();
     showCross(ev.clientX, ev.clientY);
-    Voice.speak('先點數字 ' + step + ' 喔！');
+    Voice.speak('先點數字' + numToCN(step) + '喔！');
     return;
   }
   Sfx.pop();
   g.classList.add('done');
   linePts.push(pt[0] + ',' + pt[1]);
   poly.setAttribute('points', linePts.join(' '));
-  const p = PICTURES[picIdx];
-  if (n === p.pts.length) {
+  const p = list[picIdx];
+  if (n === base + p.pts.length) {
     done = true;
     linePts.push(p.pts[0][0] + ',' + p.pts[0][1]);
     poly.setAttribute('points', linePts.join(' '));
@@ -144,7 +183,7 @@ function clickDot(g, pt, n, ev) {
     Voice.speak('太棒了！你連出' + p.name + '了！');
     setTimeout(() => {
       picIdx++;
-      if (picIdx >= PICTURES.length) {
+      if (picIdx >= list.length) {
         showWin('全部連完了！共 ' + starN + ' 顆星星！', () => { picIdx = 0; start(); });
       } else {
         Voice.speak('再來連下一個圖案！');
@@ -163,8 +202,10 @@ function start() {
   picIdx = 0;
   drawPicture();
 }
+document.getElementById('m1').addEventListener('click', () => { Sfx.click(); mode = 1; list = PICTURES.filter(p => p.set === 'a'); document.getElementById('modePick').classList.add('hide'); start(); });
+document.getElementById('m2').addEventListener('click', () => { Sfx.click(); mode = 2; list = PICTURES.filter(p => p.set === 'b'); document.getElementById('modePick').classList.add('hide'); start(); });
+document.getElementById('m3').addEventListener('click', () => { Sfx.click(); mode = 3; list = PICTURES.filter(p => p.set === 'c'); document.getElementById('modePick').classList.add('hide'); start(); });
 buildHeader('⭐ 連連看', INSTR);
-start();
 </script>
 </body>
 </html>

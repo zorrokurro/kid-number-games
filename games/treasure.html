@@ -3,32 +3,37 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>海底尋寶 | 數字樂園</title>
-<link rel="stylesheet" href="../css/style.css?v=6">
+<title>花園尋寶 | 數字樂園</title>
+<link rel="stylesheet" href="../css/style.css?v=7">
 </head>
 <body>
 <div class="page">
+  <div class="pick" id="modePick">
+    <button class="btn green" id="m1">🌱 1~10</button>
+    <button class="btn purple" id="m2">🔥 11~20</button>
+  </div>
   <div class="panel">
     <div class="hint" id="hint"></div>
-    <div class="sea-box" id="seaBox"></div>
+    <div class="garden-box" id="gardenBox"></div>
     <div class="chest-row" id="chestRow"></div>
     <div class="feedback" id="fb"></div>
   </div>
 </div>
-<script src="../js/common.js?v=6"></script>
+<script src="../js/common.js?v=7"></script>
 <script>
-const INSTR = '數一數海洋生物，點開裝著答案的寶盒！也可以點點生物幫忙數唷。';
-const CRE = [['小魚', ['🐠', '🐟']], ['章魚', ['🐙']], ['海龜', ['🐢']], ['螃蟹', ['🦀']], ['河豚', ['🐡']], ['蝦子', ['🦐']], ['鯨魚', ['🐳']], ['魷魚', ['🦑']]];
+const INSTR = '數一數花園裡的蟲蟲，點開裝著答案的寶盒！也可以點點蟲蟲幫忙數唷。';
+const GARDEN = [['蝴蝶', ['🦋']], ['蜜蜂', ['🐝']], ['瓢蟲', ['🐞']], ['蝸牛', ['🐌']], ['毛毛蟲', ['🐛']], ['螞蟻', ['🐜']], ['甲蟲', ['🪲']], ['蟋蟀', ['🦗']]];
+let mode = 1;
 let round = 0;
 const TOTAL = 10;
 let targetN = 0, targetName = '', locked = false;
 
 function addCreature(kind, isTarget) {
-  const box = document.getElementById('seaBox');
+  const box = document.getElementById('gardenBox');
   const f = document.createElement('div');
   f.className = 'fish' + (isTarget ? ' target' : '');
   f.innerHTML = '<span class="tag"></span>' + pick(kind[1]);
-  f.style.filter = 'hue-rotate(' + randInt(0, 320) + 'deg)';
+  if (mode === 1) f.style.filter = 'hue-rotate(' + randInt(0, 320) + 'deg)';
   f.addEventListener('click', () => {
     if (locked) return;
     Sfx.pop();
@@ -47,21 +52,27 @@ function newRound() {
     showWin('你找到所有寶藏了！共 ' + starN + ' 顆星星！', start);
     return;
   }
-  const box = document.getElementById('seaBox');
+  const box = document.getElementById('gardenBox');
   box.innerHTML = '';
   document.getElementById('chestRow').innerHTML = '';
-  const kind = pick(CRE);
+  const kind = pick(GARDEN);
   targetName = kind[0];
-  targetN = round <= 5 ? randInt(3, 6) : randInt(4, 9);
+  if (mode === 1) {
+    targetN = round <= 5 ? randInt(3, 6) : randInt(4, 9);
+  } else {
+    targetN = randInt(11, 20);
+  }
   for (let i = 0; i < targetN; i++) addCreature(kind, true);
-  if (round > 5) {
-    const others = CRE.filter(k => k[0] !== targetName);
+  if (mode === 1 && round > 5) {
+    const others = GARDEN.filter(k => k[0] !== targetName);
     const dKind = pick(others);
     const d = randInt(1, 3);
     for (let i = 0; i < d; i++) addCreature(dKind, false);
   }
   const row = document.getElementById('chestRow');
-  const opts = shuffle([targetN, ...wrongNums(targetN, 1, 10, 2)]);
+  const opts = mode === 1
+    ? shuffle([targetN, ...wrongNums(targetN, 1, 10, 2)])
+    : shuffle([targetN, ...wrongNums(targetN, 11, 20, 2)]);
   opts.forEach(v => {
     const b = document.createElement('button');
     b.className = 'chest';
@@ -85,8 +96,8 @@ function choose(btn, v) {
     Sfx.good();
     addStar(1);
     confetti(26);
-    const targets = [...document.querySelectorAll('#seaBox .fish.target')];
-    document.querySelectorAll('#seaBox .fish:not(.target)').forEach(f => {
+    const targets = [...document.querySelectorAll('#gardenBox .fish.target')];
+    document.querySelectorAll('#gardenBox .fish:not(.target)').forEach(f => {
       f.classList.remove('counted');
       f.querySelector('.tag').style.display = 'none';
     });
@@ -118,8 +129,9 @@ function start() {
   locked = false;
   newRound();
 }
-buildHeader('🐠 海底尋寶', INSTR);
-start();
+document.getElementById('m1').addEventListener('click', () => { Sfx.click(); mode = 1; document.getElementById('modePick').classList.add('hide'); start(); });
+document.getElementById('m2').addEventListener('click', () => { Sfx.click(); mode = 2; document.getElementById('modePick').classList.add('hide'); start(); });
+buildHeader('🦋 花園尋寶', INSTR);
 </script>
 </body>
 </html>

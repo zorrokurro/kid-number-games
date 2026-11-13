@@ -4,13 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>比一比 | 數字樂園</title>
-<link rel="stylesheet" href="../css/style.css?v=6">
+<link rel="stylesheet" href="../css/style.css?v=7">
 </head>
 <body>
 <div class="page">
+  <div class="pick" id="modePick">
+    <button class="btn green" id="m1">🌱 1~10</button>
+    <button class="btn purple" id="m2">🔥 11~20</button>
+  </div>
   <div class="panel">
     <div class="hint" id="hint">哪一邊比較多？點點看！</div>
-    <div class="cmp-box">
+    <div class="cmp-box" id="cmpBox">
       <div class="cmp-side cmp-left" id="left">
         <div class="cmp-num show" id="numL"></div>
         <div class="cmp-items" id="leftItems"></div>
@@ -23,9 +27,10 @@
     <div class="feedback" id="fb"></div>
   </div>
 </div>
-<script src="../js/common.js?v=6"></script>
+<script src="../js/common.js?v=7"></script>
 <script>
-const INSTR = '哪一邊比較多？點點看！答錯了沒關係，可以再試一次！';
+const INSTR = '哪一邊比較多？點點看！也可以點水果幫忙數唷。答錯了沒關係，可以再試一次！';
+let mode = 1;
 let round = 0;
 const TOTAL = 10;
 let leftN = 0, rightN = 0;
@@ -36,8 +41,16 @@ function fillSide(box, n, fruit) {
   for (let i = 0; i < n; i++) {
     const s = document.createElement('span');
     s.className = 'cmp-item';
-    s.textContent = fruit;
+    s.innerHTML = fruit + '<i class="ctag"></i>';
     s.style.transform = 'rotate(' + randInt(-18, 18) + 'deg) scale(' + (0.9 + Math.random() * 0.25) + ')';
+    s.addEventListener('click', ev => {
+      ev.stopPropagation();
+      if (locked || s.classList.contains('tagged')) return;
+      Sfx.pop();
+      s.classList.add('tagged');
+      const k = box.querySelectorAll('.cmp-item.tagged').length;
+      s.querySelector('.ctag').textContent = k;
+    });
     box.appendChild(s);
   }
 }
@@ -49,9 +62,11 @@ function newRound() {
     return;
   }
   const fruit = pick(['🍎', '🍓', '🍊', '🍇', '🍌']);
+  const lo = mode === 1 ? 1 : 11;
+  const hi = mode === 1 ? 9 : 20;
   do {
-    leftN = randInt(1, 9);
-    rightN = randInt(1, 9);
+    leftN = randInt(lo, hi);
+    rightN = randInt(lo, hi);
   } while (leftN === rightN);
   fillSide(document.getElementById('leftItems'), leftN, fruit);
   fillSide(document.getElementById('rightItems'), rightN, fruit);
@@ -74,11 +89,16 @@ function choose(side, n, el) {
     el.classList.add('cmp-ok');
     Sfx.good();
     addStar(1);
+    const box = document.querySelector('#' + side + 'Items');
+    box.querySelectorAll('.cmp-item').forEach((it, i) => setTimeout(() => {
+      it.classList.add('tagged');
+      it.querySelector('.ctag').textContent = i + 1;
+    }, i * 110));
     fb.textContent = '答對了！' + (side === 'left' ? '左邊' : '右邊') + '比較多！';
     fb.className = 'feedback good';
     Voice.speak('答對了！' + (side === 'left' ? '左邊' : '右邊') + '比較多！');
     confetti(24);
-    setTimeout(newRound, 1800);
+    setTimeout(newRound, 2000);
   } else {
     Sfx.bad();
     showCross(...elCenter(el));
@@ -99,10 +119,10 @@ function start() {
   round = 0;
   newRound();
 }
+document.getElementById('m1').addEventListener('click', () => { Sfx.click(); mode = 1; document.getElementById('cmpBox').classList.remove('dense'); document.getElementById('modePick').classList.add('hide'); start(); });
+document.getElementById('m2').addEventListener('click', () => { Sfx.click(); mode = 2; document.getElementById('cmpBox').classList.add('dense'); document.getElementById('modePick').classList.add('hide'); start(); });
 buildHeader('🍎 比一比', INSTR);
-document.getElementById('left').addEventListener('click', () => choose('left', leftN, document.getElementById('left')));
-document.getElementById('right').addEventListener('click', () => choose('right', rightN, document.getElementById('right')));
-start();
+document.getElementById('hint').innerHTML = '🎭 選一個數字範圍開始吧！';
 </script>
 </body>
 </html>
