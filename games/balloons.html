@@ -97,7 +97,7 @@ function popBalloon(b, e) {
     score++;
     addStar(1);
     const sky = document.getElementById('sky');
-    if (mode === 2) updateHint();
+    if (mode === 2 || mode === 4) updateHint();
     if (score >= goal) {
       locked = true;
       clearInterval(spawnTimer);
