@@ -122,6 +122,8 @@ function start() {
 document.getElementById('m1').addEventListener('click', () => { Sfx.click(); mode = 1; document.getElementById('cmpBox').classList.remove('dense'); document.getElementById('modePick').classList.add('hide'); start(); });
 document.getElementById('m2').addEventListener('click', () => { Sfx.click(); mode = 2; document.getElementById('cmpBox').classList.add('dense'); document.getElementById('modePick').classList.add('hide'); start(); });
 buildHeader('🍎 比一比', INSTR);
+document.getElementById('left').addEventListener('click', () => choose('left', leftN, document.getElementById('left')));
+document.getElementById('right').addEventListener('click', () => choose('right', rightN, document.getElementById('right')));
 document.getElementById('hint').innerHTML = '🎭 選一個數字範圍開始吧！';
 </script>
 </body>
