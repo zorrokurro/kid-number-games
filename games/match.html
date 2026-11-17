@@ -27,12 +27,13 @@
 </div>
 <script src="../js/common.js?v=11"></script>
 <script>
-const INSTR = '翻翻卡片，找出數字和點點一樣多的那一對！';
+const INSTR = '每一桌開始前，會先把全部的牌打開 5 秒讓你記位置，蓋起來後翻翻卡片，找出數字和點點一樣多的那一對！';
 let mode = 1;
 let boards = 0;
 const BOARDS_TOTAL = 3;
 let openCards = [];
 let lock = false;
+let peekTimer = null;
 
 function pickNums() {
   if (mode === 1) return shuffle([1, 2, 3, 4, 5]).slice(0, 3);
@@ -153,7 +154,8 @@ function flip(c, kind, num) {
 }
 function buildBoard(nums) {
   openCards = [];
-  lock = false;
+  lock = true;
+  clearInterval(peekTimer);
   const items = [];
   nums.forEach(n => { items.push(['num', n], [mode === 3 ? 'word' : 'dots', n]); });
   const grid = document.getElementById('grid');
@@ -163,6 +165,26 @@ function buildBoard(nums) {
   const fb = document.getElementById('fb');
   fb.textContent = '';
   fb.className = 'feedback';
+  // 開始前先全部打開 5 秒，讓孩子記住位置再蓋牌
+  const cards = [...grid.children];
+  cards.forEach(c => c.classList.add('open'));
+  let left = 5;
+  const hintEl = document.getElementById('hint');
+  hintEl.innerHTML = '👀 全部打開了！<span style="color:#ff5f6f">5</span> 秒後蓋牌，快記住位置！';
+  Voice.speak('先記住位置！五秒後要蓋起來唷！');
+  peekTimer = setInterval(() => {
+    left--;
+    if (left > 0) {
+      hintEl.innerHTML = '👀 全部打開了！<span style="color:#ff5f6f">' + left + '</span> 秒後蓋牌，快記住位置！';
+      if (left <= 2) Sfx.tick();
+    } else {
+      clearInterval(peekTimer);
+      cards.forEach(c => c.classList.remove('open'));
+      lock = false;
+      hintEl.innerHTML = '蓋起來了！翻翻卡片，把數字和' + (mode === 3 ? '中文' : '一樣多的點點') + '配對！';
+      Voice.speak('蓋起來了！開始配對吧！');
+    }
+  }, 1000);
 }
 function nextBoard() {
   boards++;
