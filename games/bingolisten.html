@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>數字賓果聽題版 | 數字樂園</title>
-<link rel="stylesheet" href="../css/style.css?v=11">
+<link rel="stylesheet" href="../css/style.css?v=12">
 </head>
 <body class="theme-carnival">
 <div class="page">
@@ -22,7 +22,7 @@
     <div class="feedback" id="fb"></div>
   </div>
 </div>
-<script src="../js/common.js?v=11"></script>
+<script src="../js/common.js?v=12"></script>
 <script>
 const INSTR = '注意聽！老師會用聲音叫號碼（畫面上看不到唷），快點在賓果盤上找出它！忘記了按 🔊 再聽一次！連成一條線就大聲喊 BINGO！';
 const LINES = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
@@ -76,10 +76,10 @@ function callNext() {
   announce();
 }
 // 讀題：先問「找找看，數字X在哪裡？」，再補一句「數字X！」讓號碼更清楚
-function announce() {
+function announce(keep) {
   if (!lastCall) return;
-  Voice.speak('找找看，數字' + lastCall + '在哪裡？');
-  Voice.speak('數字' + lastCall + '！');
+  Voice.speak('找找看，數字' + lastCall + '在哪裡？', keep);
+  Voice.speak('數字' + lastCall + '！', true);
 }
 function clickCell(cell, n, i, ev) {
   if (locked || hits.has(i)) return;
@@ -92,7 +92,7 @@ function clickCell(cell, n, i, ev) {
     fb.textContent = '不是這個號碼！按 🔊 再聽一次！';
     fb.className = 'feedback badf';
     Voice.speak('不是這個喔！再聽一次！');
-    announce();
+    announce(true);
     return;
   }
   Sfx.pop();

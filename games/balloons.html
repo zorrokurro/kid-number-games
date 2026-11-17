@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>點氣球 | 數字樂園</title>
-<link rel="stylesheet" href="../css/style.css?v=11">
+<link rel="stylesheet" href="../css/style.css?v=12">
 </head>
 <body>
 <div class="page">
@@ -27,7 +27,7 @@
     </div>
   </div>
 </div>
-<script src="../js/common.js?v=11"></script>
+<script src="../js/common.js?v=12"></script>
 <script>
 const INSTR = '選一個玩法：換數字，或同一個數字大挑戰！可以選 1~10 或 11~20！';
 let target = 0;
@@ -55,7 +55,9 @@ function setTarget() {
 }
 function spawn(forceTarget) {
   const sky = document.getElementById('sky');
-  if (sky.querySelectorAll('.balloon').length >= 7) return;
+  const cnt = sky.querySelectorAll('.balloon').length;
+  // 目標氣球即使天空很滿也要生出來（上限放寬），不然孩子會等不到
+  if (cnt >= (forceTarget ? 9 : 7)) return;
   const b = document.createElement('div');
   b.className = 'balloon';
   let num = randInt(lo, hi);
@@ -124,6 +126,7 @@ function popBalloon(b, e) {
     const fb = document.getElementById('fb');
     if (fb) { fb.textContent = '去找數字 ' + target + ' 的氣球！'; fb.className = 'feedback badf'; }
     Voice.speak('找一找，數字 ' + numToCN(target) + ' 的氣球！');
+    return; // 點錯的氣球留在畫面上（搖一下），讓孩子可以再確認
   }
   setTimeout(() => b.remove(), 250);
 }

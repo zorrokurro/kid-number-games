@@ -53,7 +53,7 @@ const Sfx = {
 };
 
 const Voice = {
-  speak(text) {
+  speak(text, keep) {
     if (Muted) return;
     if (!window.speechSynthesis) return;
     const u = new SpeechSynthesisUtterance(text);
@@ -65,7 +65,7 @@ const Voice = {
       let tw = vs.find(v => /tw|taiwan|hant|hong|yue/i.test(v.lang + v.name));
       u.voice = tw || vs[0];
     }
-    speechSynthesis.cancel();
+    if (!keep) speechSynthesis.cancel();
     speechSynthesis.speak(u);
   }
 };
