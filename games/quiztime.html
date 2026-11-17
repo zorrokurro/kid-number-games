@@ -152,7 +152,9 @@ function newRound() {
   const card = document.getElementById('qCard');
   card.innerHTML = '';
   card.style.background = scene.bg;
-  scene.props.forEach((p, i) => {
+  // 場景角落裝飾（排除與題目／干擾物重複的 emoji，避免孩子數到不能數的裝飾）
+  const usedE = scene.groups.flatMap(g => g.emoji);
+  scene.props.filter(p => !usedE.includes(p)).forEach((p, i) => {
     const d = document.createElement('span');
     d.className = 'q-prop';
     d.textContent = p;

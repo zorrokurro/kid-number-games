@@ -1148,6 +1148,7 @@ body.theme-quiz::before, body.theme-quiz::after { display: none; }
 .quiz-opt:active { transform: translateY(3px); }
 .quiz-opt.ok { background: linear-gradient(180deg, #43d19e, #2c9b72); border-color: #b3f0d8; animation: pop-ok .45s; }
 .quiz-opt.reveal { background: linear-gradient(180deg, #ffc63c, #e8890c); border-color: #ffe08a; }
+.quiz-tools { display: flex; justify-content: center; margin-top: 10px; }
 .quiz-progress {
   position: relative;
   width: min(620px, 90%); height: 22px; margin: 18px auto 0;
