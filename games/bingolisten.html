@@ -72,8 +72,14 @@ function callNext() {
   document.getElementById('hint').innerHTML = '👂 注意聽！按 🔊 可以再聽一次！';
   document.getElementById('fb').textContent = '';
   document.getElementById('fb').className = 'feedback';
-  lastCall = numToCN(n) + '！找找看！';
-  Voice.speak(lastCall);
+  lastCall = numToCN(n);
+  announce();
+}
+// 讀題：先問「找找看，數字X在哪裡？」，再補一句「數字X！」讓號碼更清楚
+function announce() {
+  if (!lastCall) return;
+  Voice.speak('找找看，數字' + lastCall + '在哪裡？');
+  Voice.speak('數字' + lastCall + '！');
 }
 function clickCell(cell, n, i, ev) {
   if (locked || hits.has(i)) return;
@@ -85,7 +91,8 @@ function clickCell(cell, n, i, ev) {
     const fb = document.getElementById('fb');
     fb.textContent = '不是這個號碼！按 🔊 再聽一次！';
     fb.className = 'feedback badf';
-    Voice.speak('不是這個喔！再聽一次！' + numToCN(want) + '！');
+    Voice.speak('不是這個喔！再聽一次！');
+    announce();
     return;
   }
   Sfx.pop();
@@ -136,7 +143,7 @@ document.getElementById('m1').addEventListener('click', () => { Sfx.click(); mod
 document.getElementById('m2').addEventListener('click', () => { Sfx.click(); mode = 2; document.getElementById('modePick').classList.add('hide'); start(); });
 document.getElementById('playBtn').addEventListener('click', () => {
   Sfx.click();
-  if (lastCall) Voice.speak(lastCall);
+  announce();
 });
 buildHeader('👂 數字賓果聽題版', INSTR);
 </script>
