@@ -189,6 +189,9 @@ function newRound() {
   wl.textContent = '?'; wr.textContent = '?';
   wl.className = 'cmp-write active';
   wr.className = 'cmp-write';
+  // 清掉上一題的綠色標記（不然下一題還亮著上一題的答案）
+  document.getElementById('left').classList.remove('cmp-ok', 'cmp-bad');
+  document.getElementById('right').classList.remove('cmp-ok', 'cmp-bad');
   document.getElementById('cmpSvg').innerHTML = '';
   document.getElementById('cmpTools').innerHTML = '';
   pairToken++;
