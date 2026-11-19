@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>比一比 | 數字樂園</title>
-<link rel="stylesheet" href="../css/style.css?v=16">
+<link rel="stylesheet" href="../css/style.css?v=17">
 </head>
 <body class="theme-candy">
 <div class="page">
@@ -30,7 +30,7 @@
     <div class="feedback" id="fb"></div>
   </div>
 </div>
-<script src="../js/common.js?v=16"></script>
+<script src="../js/common.js?v=17"></script>
 <script>
 const INSTR = '像練習單一樣：先數一數兩邊有幾個，點數字寫下來，再點比較多的那一邊打 ✓！也可以點水果幫忙數唷。';
 let mode = 1;
@@ -41,6 +41,7 @@ let phase = 'countL';
 let leftDone = false, rightDone = false;
 let locked = false;
 let lastLeft = 0, lastRight = 0;
+let pairToken = 0;   // 換題或重畫時，取消還沒畫完的配對線
 
 function fillSide(box, n, fruit) {
   box.innerHTML = '';
@@ -131,7 +132,9 @@ function buildTools() {
 function drawPairing(done) {
   const svg = document.getElementById('cmpSvg');
   const boxR = document.getElementById('cmpBox').getBoundingClientRect();
+  const token = ++pairToken;
   svg.innerHTML = '';
+  svg.classList.remove('done');
   svg.setAttribute('viewBox', '0 0 ' + Math.round(boxR.width) + ' ' + Math.round(boxR.height));
   const lItems = [...document.querySelectorAll('#leftItems .cmp-item')];
   const rItems = [...document.querySelectorAll('#rightItems .cmp-item')];
@@ -142,6 +145,7 @@ function drawPairing(done) {
   };
   for (let i = 0; i < n; i++) {
     setTimeout(() => {
+      if (token !== pairToken) return;
       const [x1, y1] = center(lItems[i]);
       const [x2, y2] = center(rItems[i]);
       const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
@@ -151,8 +155,10 @@ function drawPairing(done) {
       svg.appendChild(line);
       Sfx.pop();
       if (i === n - 1) {
+        // 多出來的「每一顆」都標記，不是只有第一顆
         const more = lItems.length > rItems.length ? lItems : rItems;
-        if (more[n]) more[n].classList.add('alone');
+        more.slice(n).forEach(el => el.classList.add('alone'));
+        svg.classList.add('done');
         if (done) setTimeout(done, 500);
       }
     }, i * 260);
@@ -185,6 +191,7 @@ function newRound() {
   wr.className = 'cmp-write';
   document.getElementById('cmpSvg').innerHTML = '';
   document.getElementById('cmpTools').innerHTML = '';
+  pairToken++;
   buildPad();
   const fb = document.getElementById('fb');
   fb.textContent = '';
@@ -202,7 +209,7 @@ function choose(side, n, el) {
     const mark = document.createElement('div');
     mark.className = 'cmp-check';
     mark.textContent = '✓';
-    el.appendChild(mark);
+    document.getElementById(side === 'left' ? 'writeL' : 'writeR').appendChild(mark);
     Sfx.good();
     addStar(2);
     drawPairing(() => {
