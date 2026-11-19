@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>點氣球 | 數字樂園</title>
-<link rel="stylesheet" href="../css/style.css?v=13">
+<link rel="stylesheet" href="../css/style.css?v=14">
 </head>
 <body>
 <div class="page">
@@ -27,7 +27,7 @@
     </div>
   </div>
 </div>
-<script src="../js/common.js?v=13"></script>
+<script src="../js/common.js?v=14"></script>
 <script>
 const INSTR = '選一個玩法：換數字，或同一個數字大挑戰！可以選 1~10 或 11~20！';
 let target = 0;
@@ -66,7 +66,7 @@ function spawn(forceTarget) {
   else if ((mode === 2 || mode === 4) && num === target) num = lo + ((target - lo + 1) % (hi - lo + 1));
   b.textContent = num;
   b.style.background = BCOLORS[randInt(0, BCOLORS.length - 1)];
-  b.style.left = randInt(2, 82) + '%';
+  b.style.left = randInt(2, 74) + '%';
   const dur = randInt(16, 24);
   b.style.animationDuration = dur + 's';
   b.style.animationDelay = '0s';
