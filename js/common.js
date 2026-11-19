@@ -1,4 +1,6 @@
 let Muted = localStorage.getItem('kid_mute') === '1';
+// 數數語音開關：關掉後只不念「一、二、三…」，音效與其他語音照常
+let CountOff = localStorage.getItem('kid_nocount') === '1';
 let starN = 0;
 let actx = null;
 
@@ -67,6 +69,11 @@ const Voice = {
     }
     if (!keep) speechSynthesis.cancel();
     speechSynthesis.speak(u);
+  },
+  // 逐項數數的語音（「一！」「二！」…），可用標頭的數數開關單獨關掉
+  count(n, tail) {
+    if (CountOff) return;
+    this.speak(numToCN(n) + (tail === undefined ? '！' : tail));
   }
 };
 document.addEventListener('click', function unlock() { actxEnsure(); }, { once: true });
@@ -88,19 +95,37 @@ function toggleMute() {
   if (Muted && window.speechSynthesis) speechSynthesis.cancel();
 }
 
-function buildHeader(title, instructions) {
+function toggleCountVoice() {
+  CountOff = !CountOff;
+  localStorage.setItem('kid_nocount', CountOff ? '1' : '0');
+  if (CountOff && window.speechSynthesis) speechSynthesis.cancel();
+}
+
+function buildHeader(title, instructions, opts) {
+  const showCount = !!(opts && opts.count);
   const h = document.createElement('div');
   h.className = 'top';
   h.innerHTML = '<a class="btn home" href="../index.html">🏠 大廳</a>' +
     '<div class="ttl">' + title + '</div>' +
     '<div class="tools">' +
     '<button class="btn blue icon" id="sayBtn">🔊 聽說明</button>' +
+    (showCount ? '<button class="btn icon" id="countBtn" title="數數語音開關（音效不受影響）"></button>' : '') +
     '<button class="btn icon" id="muteBtn"></button>' +
     '<div class="stars">⭐ <b id="starN">0</b></div>' +
     '</div>';
   const page = document.querySelector('.page');
   page.insertBefore(h, page.firstChild);
   document.getElementById('sayBtn').addEventListener('click', () => { Sfx.click(); Voice.speak(instructions); });
+  if (showCount) {
+    const cb = document.getElementById('countBtn');
+    const updCount = () => {
+      cb.textContent = CountOff ? '🔢🔇' : '🔢🔊';
+      cb.classList.toggle('green', !CountOff);
+      cb.classList.toggle('orange', CountOff);
+    };
+    updCount();
+    cb.addEventListener('click', () => { Sfx.click(); toggleCountVoice(); updCount(); });
+  }
   const mb = document.getElementById('muteBtn');
   const upd = () => { mb.textContent = Muted ? '🔇' : '📢'; mb.classList.toggle('orange', true); };
   upd();

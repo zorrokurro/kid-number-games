@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>收蔬菜 | 數字樂園</title>
-<link rel="stylesheet" href="../css/style.css?v=12">
+<link rel="stylesheet" href="../css/style.css?v=13">
 </head>
 <body class="theme-farm">
 <div class="page">
@@ -23,7 +23,7 @@
     <div class="feedback" id="fb"></div>
   </div>
 </div>
-<script src="../js/common.js?v=12"></script>
+<script src="../js/common.js?v=13"></script>
 <script>
 const INSTR = '把菜園裡的蔬菜全部採收起來！一邊採一邊大聲數，再告訴農夫一共採了幾個！可以選 1~10 或挑戰 11~20！';
 const VEG = [['紅蘿蔔', '🥕'], ['番茄', '🍅'], ['玉米', '🌽'], ['茄子', '🍆'], ['馬鈴薯', '🥔'], ['草莓', '🍓']];
@@ -79,7 +79,7 @@ function pickCrop(c, ev) {
   s.className = 'strip-c';
   s.innerHTML = c.textContent + '<b>' + picked + '</b>';
   strip.appendChild(s);
-  Voice.speak(numToCN(picked));
+  Voice.count(picked, '');
   if (picked >= targetN) {
     locked = true;
     setTimeout(() => {
@@ -134,7 +134,7 @@ function start() {
   locked = false;
   newRound();
 }
-buildHeader('🥕 收蔬菜', INSTR);
+buildHeader('🥕 收蔬菜', INSTR, { count: true });
 document.getElementById('m1').addEventListener('click', () => { Sfx.click(); mode = 1; document.getElementById('modePick').classList.add('hide'); start(); });
 document.getElementById('m2').addEventListener('click', () => { Sfx.click(); mode = 2; document.getElementById('modePick').classList.add('hide'); start(); });
 </script>

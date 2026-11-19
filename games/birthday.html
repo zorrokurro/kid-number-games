@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>生日蠟燭 | 數字樂園</title>
-<link rel="stylesheet" href="../css/style.css?v=12">
+<link rel="stylesheet" href="../css/style.css?v=13">
 </head>
 <body class="theme-candy">
 <div class="page">
@@ -34,7 +34,7 @@
     <div class="feedback" id="fb"></div>
   </div>
 </div>
-<script src="../js/common.js?v=12"></script>
+<script src="../js/common.js?v=13"></script>
 <script>
 const INSTR = '數一數蛋糕上的蠟燭，點蠟燭幫忙數，再選出正確的歲數！答對 5 題可以自己裝飾蛋糕！';
 let mode = 1;
@@ -82,7 +82,7 @@ function lightCandle(c) {
   c.classList.add('lit');
   c.querySelector('.cnum').textContent = lit;
   Sfx.pop();
-  Voice.speak(numToCN(lit));
+  Voice.count(lit, '');
 }
 function choose(btn, v) {
   if (locked) return;
@@ -176,7 +176,7 @@ function start() {
 }
 document.getElementById('m1').addEventListener('click', () => { Sfx.click(); mode = 1; document.getElementById('modePick').classList.add('hide'); start(); });
 document.getElementById('m2').addEventListener('click', () => { Sfx.click(); mode = 2; document.getElementById('modePick').classList.add('hide'); start(); });
-buildHeader('🎂 生日蠟燭', INSTR);
+buildHeader('🎂 生日蠟燭', INSTR, { count: true });
 </script>
 </body>
 </html>

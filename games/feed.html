@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>餵熊熊 | 數字樂園</title>
-<link rel="stylesheet" href="../css/style.css?v=12">
+<link rel="stylesheet" href="../css/style.css?v=13">
 </head>
 <body class="theme-honey">
 <div class="page">
@@ -25,7 +25,7 @@
     <div class="feedback" id="fb"></div>
   </div>
 </div>
-<script src="../js/common.js?v=12"></script>
+<script src="../js/common.js?v=13"></script>
 <script>
 const INSTR = '熊熊肚子好餓！照題目說的數量，點餅乾餵牠吃，一邊餵一邊大聲數！';
 let mode = 1;
@@ -77,7 +77,7 @@ function feed(c) {
   s.textContent = '🍪';
   b.appendChild(s);
   document.getElementById('fedN').textContent = fed;
-  Voice.speak(numToCN(fed));
+  Voice.count(fed, '');
   if (fed >= target) {
     locked = true;
     document.getElementById('bear').classList.add('happy');
@@ -103,7 +103,7 @@ function start() {
 }
 document.getElementById('m1').addEventListener('click', () => { Sfx.click(); mode = 1; document.getElementById('modePick').classList.add('hide'); start(); });
 document.getElementById('m2').addEventListener('click', () => { Sfx.click(); mode = 2; document.getElementById('modePick').classList.add('hide'); start(); });
-buildHeader('🐻 餵熊熊', INSTR);
+buildHeader('🐻 餵熊熊', INSTR, { count: true });
 </script>
 </body>
 </html>
