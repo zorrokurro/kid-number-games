@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>圖形規律 | 數字樂園</title>
-<link rel="stylesheet" href="../css/style.css?v=14">
+<link rel="stylesheet" href="../css/style.css?v=15">
 </head>
 <body class="theme-candy">
 <div class="page">
@@ -19,7 +19,7 @@
     <div class="feedback" id="fb"></div>
   </div>
 </div>
-<script src="../js/common.js?v=14"></script>
+<script src="../js/common.js?v=15"></script>
 <script>
 const INSTR = '看看隊伍排法的規律，猜猜問號後面是誰！說說看：紅藍紅藍…下一個是誰？';
 const SETS = [
@@ -80,7 +80,7 @@ function newRound() {
   shown.forEach(s => {
     const t = document.createElement('div');
     t.className = 'pat-tile' + (s === '?' ? ' q' : '');
-    t.textContent = s;
+    fillGlyph(t, s);
     row.appendChild(t);
   });
   const box = document.getElementById('patOpts');
@@ -89,7 +89,7 @@ function newRound() {
   opts.forEach(o => {
     const b = document.createElement('button');
     b.className = 'pat-opt';
-    b.textContent = o;
+    fillGlyph(b, o);
     b.addEventListener('click', () => choose(b, o));
     box.appendChild(b);
   });
@@ -116,11 +116,11 @@ function choose(btn, o) {
     addStar(1);
     confetti(24);
     const tiles = [...document.querySelectorAll('.pat-tile.q')];
-    tiles[0].textContent = answer;
+    fillGlyph(tiles[0], answer);
     tiles[0].classList.remove('q');
     tiles[0].classList.add('fill');
     rowWave();
-    fb.textContent = '答對了！規律是 ' + seq.join(' ') + ' ' + seq.join(' ') + '…';
+    fb.textContent = '答對了！規律是 ' + seq.map(v => DOT_NAME[v] || v).join('・') + ' …';
     fb.className = 'feedback good';
     Voice.speak('答對了！你發現規律了！');
     setTimeout(newRound, 2000);

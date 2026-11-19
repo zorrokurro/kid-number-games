@@ -137,6 +137,18 @@ function buildHeader(title, instructions, opts) {
 }
 
 const PALETTE = ['#ff5f6f', '#ffc63c', '#43d19e', '#54a7ff', '#b06ef7', '#ff9d54'];
+// 顏色圓點改用 CSS 畫（舊裝置對 🟡🟢🟠 這些較新的 emoji 會缺字，黃色圓點在淺底上也不清楚）
+const DOT_HEX = { '🔴': '#ff5f6f', '🔵': '#54a7ff', '🟡': '#ffc63c', '🟢': '#43d19e', '🟠': '#ff9d54' };
+const DOT_NAME = { '🔴': '紅', '🔵': '藍', '🟡': '黃', '🟢': '綠', '🟠': '橘' };
+function fillGlyph(el, val) {
+  const hex = DOT_HEX[val];
+  if (!hex) { el.textContent = val; return; }
+  el.textContent = '';
+  const i = document.createElement('i');
+  i.className = 'cdot';
+  i.style.background = hex;
+  el.appendChild(i);
+}
 function confetti(n) {
   for (let i = 0; i < (n || 40); i++) {
     const s = document.createElement('span');

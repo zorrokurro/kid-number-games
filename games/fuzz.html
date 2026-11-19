@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>毛毛蟲分類 | 數字樂園</title>
-<link rel="stylesheet" href="../css/style.css?v=14">
+<link rel="stylesheet" href="../css/style.css?v=15">
 </head>
 <body class="theme-garden">
 <div class="page">
@@ -25,7 +25,7 @@
     </div>
   </div>
 </div>
-<script src="../js/common.js?v=14"></script>
+<script src="../js/common.js?v=15"></script>
 <script>
 const INSTR = '毛絨蟲跑出來了！點一隻蟲蟲，再點牠的顏色罐子，把牠放回家！分完再數數看！';
 const COLORS = [
@@ -49,9 +49,10 @@ function newRound() {
   selected = null;
   round++;
   if (round > TOTAL) { startCount(); return; }
-  // 挑 3 種顏色（和上一輪不完全一樣）
+  // 挑 3~4 種顏色（和上一輪不完全一樣）
+  const wantN = round === 1 ? 3 : 4;
   let cs;
-  do { cs = shuffle(COLORS.slice()).slice(0, 3); } while (lastColors.length && cs.every(c => lastColors.includes(c)));
+  do { cs = shuffle(COLORS.slice()).slice(0, wantN); } while (lastColors.length && cs.every(c => lastColors.includes(c)));
   lastColors = cs.map(c => c.hex);
   jars = cs;
   counts = {};
@@ -59,12 +60,15 @@ function newRound() {
   table.innerHTML = '';
   const row = document.getElementById('jarRow');
   row.innerHTML = '';
+  const bugList = [];
   cs.forEach(c => {
     const n = randInt(2, 3);
     counts[c.hex] = n;
-    for (let i = 0; i < n; i++) table.appendChild(makeBug(c));
+    for (let i = 0; i < n; i++) bugList.push(c);
     row.appendChild(makeJar(c));
   });
+  // 蟲蟲要打散，不能照顏色分堆（不然孩子只要照罐子順序抓就好）
+  shuffle(bugList).forEach(c => table.appendChild(makeBug(c)));
   document.getElementById('hint').innerHTML = '第 ' + round + ' / ' + TOTAL + ' 輪：點一隻蟲蟲，再點牠的顏色罐子！';
   const fb = document.getElementById('fb');
   fb.textContent = '';

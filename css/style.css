@@ -986,7 +986,8 @@ body.theme-carnival { background: linear-gradient(180deg, #b06ef7 0%, #ff7eb3 50
 .bug::before, .bug::after {
   content: ''; position: absolute; top: 13px;
   width: 11px; height: 13px; border-radius: 50%;
-  background: #fff;
+  background: #3b2b52;
+  box-shadow: inset 3px 3px 0 rgba(255,255,255,.55);
 }
 .bug::before { left: 15px; }
 .bug::after { right: 15px; }
@@ -1086,6 +1087,7 @@ body.theme-carnival { background: linear-gradient(180deg, #b06ef7 0%, #ff7eb3 50
   background: linear-gradient(160deg, #d8ecff, #b3d9ff);
   box-shadow: 0 6px 0 rgba(0,0,0,.14);
   font-size: 48px; font-family: inherit;
+  display: flex; align-items: center; justify-content: center;
   transition: transform .12s;
 }
 .pat-opt:hover { transform: scale(1.1) translateY(-3px); }
@@ -1125,6 +1127,14 @@ body.theme-quiz::before, body.theme-quiz::after { display: none; }
   filter: drop-shadow(0 3px 4px rgba(0,0,0,.2));
   line-height: 1;
   user-select: none;
+}
+/* 用 CSS 畫的顏色圓點（取代 🟡🟢🟠 等較新 emoji，舊裝置也不會缺字） */
+.cdot {
+  display: block;
+  width: .82em; height: .82em;
+  border-radius: 50%;
+  border: .07em solid rgba(0,0,0,.22);
+  box-shadow: 0 .04em 0 rgba(0,0,0,.12);
 }
 .q-item.q-dark { filter: drop-shadow(0 3px 6px rgba(255,255,160,.5)); }
 .q-prop {

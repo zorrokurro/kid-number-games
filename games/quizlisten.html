@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>數數聽題版 | 數字樂園</title>
-<link rel="stylesheet" href="../css/style.css?v=14">
+<link rel="stylesheet" href="../css/style.css?v=15">
 </head>
 <body class="theme-quiz">
 <div class="page">
@@ -22,7 +22,7 @@
     <div class="feedback" id="fb"></div>
   </div>
 </div>
-<script src="../js/common.js?v=14"></script>
+<script src="../js/common.js?v=15"></script>
 <script>
 const INSTR = '用耳朵聽題目！聽清楚要數什麼，再數一數，在三個數字裡挑出正確答案！按 🔊 可以再聽一次！';
 const SCENES = [
@@ -169,7 +169,7 @@ function newRound() {
   const mk = () => {
     const s = document.createElement('span');
     s.className = 'q-item' + (scene.dark ? ' q-dark' : '');
-    s.textContent = pick(tg.emoji);
+    fillGlyph(s, pick(tg.emoji));
     s.style.fontSize = randInt(38, 50) + 'px';
     s.style.transform = 'rotate(' + randInt(-14, 14) + 'deg) ' + (Math.random() < .5 ? 'scaleX(-1)' : '');
     return s;
@@ -178,7 +178,7 @@ function newRound() {
   const dis = Array.from({ length: disN }, () => {
     const s = document.createElement('span');
     s.className = 'q-item' + (scene.dark ? ' q-dark' : '');
-    s.textContent = pick(pick(dg).emoji);
+    fillGlyph(s, pick(pick(dg).emoji));
     s.style.fontSize = randInt(38, 50) + 'px';
     s.style.transform = 'rotate(' + randInt(-14, 14) + 'deg) ' + (Math.random() < .5 ? 'scaleX(-1)' : '');
     return s;
