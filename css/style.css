@@ -605,6 +605,11 @@ body::after {
 }
 .win-card .big { font-size: 46px; margin-bottom: 10px; }
 .win-card .row { display: flex; gap: 14px; justify-content: center; margin-top: 22px; }
+/* 時間到／失敗結算：橘色邊框、稍暖的底，不用彩帶 */
+.win-mask.lose .win-card { border-color: #ff9d54; background: #fffaf3; }
+.win-mask.lose .win-card .big { font-size: 58px; }
+.win-card .sub { font-size: 24px; font-weight: 800; color: #6b5a9e; margin-top: 10px; }
+.win-card .sub b { color: #ff5f6f; font-size: 30px; }
 @keyframes pop-in {
   from { transform: scale(.6); opacity: 0; }
   to { transform: scale(1); opacity: 1; }

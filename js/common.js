@@ -51,6 +51,8 @@ const Sfx = {
   good() { beep(523, 0.12, 'triangle', 0.3); beep(659, 0.12, 'triangle', 0.3, 0.1); beep(784, 0.2, 'triangle', 0.3, 0.2); },
   bad() { beep(300, 0.14, 'square', 0.25); beep(210, 0.2, 'square', 0.25, 0.14); beep(140, 0.3, 'square', 0.22, 0.32); },
   win() { [523, 659, 784, 1047].forEach((f, i) => beep(f, 0.18, 'triangle', 0.3, i * 0.12)); beep(1319, 0.4, 'triangle', 0.3, 0.55); },
+  // 失敗／時間到：往下掉的「哇哇哇」，不會嚇到小孩
+  lose() { beep(392, 0.24, 'triangle', 0.28); beep(311, 0.24, 'triangle', 0.28, 0.22); beep(233, 0.5, 'triangle', 0.28, 0.44); },
   tick() { beep(900, 0.05, 'square', 0.18); }
 };
 
@@ -189,6 +191,24 @@ function showWin(msg, onReplay) {
   Sfx.win();
   confetti(80);
   Voice.speak('太棒了！你最厲害！');
+  mask.querySelector('#reBtn').addEventListener('click', () => {
+    Sfx.click();
+    mask.remove();
+    onReplay();
+  });
+}
+
+// 時間到／挑戰失敗的結算視窗（不撒彩帶、播往下掉的音效）
+function showLose(msg, onReplay) {
+  const mask = document.createElement('div');
+  mask.className = 'win-mask lose';
+  mask.innerHTML = '<div class="win-card"><div class="big">⏰</div><div>' + msg + '</div>' +
+    '<div class="win-stars">⭐ ' + starN + ' ⭐</div>' +
+    '<div class="row"><button class="btn green" id="reBtn">🔄 再挑戰一次</button>' +
+    '<a class="btn pink" href="../index.html">🏠 回大廳</a></div></div>';
+  document.body.appendChild(mask);
+  requestAnimationFrame(() => mask.classList.add('show'));
+  Sfx.lose();
   mask.querySelector('#reBtn').addEventListener('click', () => {
     Sfx.click();
     mask.remove();

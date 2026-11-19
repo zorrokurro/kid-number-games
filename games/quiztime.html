@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>數數限時挑戰 | 數字樂園</title>
-<link rel="stylesheet" href="../css/style.css?v=15">
+<link rel="stylesheet" href="../css/style.css?v=16">
 </head>
 <body class="theme-quiz">
 <div class="page">
@@ -19,9 +19,9 @@
     <div class="feedback" id="fb"></div>
   </div>
 </div>
-<script src="../js/common.js?v=15"></script>
+<script src="../js/common.js?v=16"></script>
 <script>
-const INSTR = '限時挑戰！每題只有 15 秒，看圖數一數，快點出正確答案！時間到會公布答案，別緊張！';
+const INSTR = '限時挑戰！每題只有 15 秒，看圖數一數，快點出正確答案！時間到挑戰就結束，要專心喔！';
 const SCENES = [
   {
     name: '海底', bg: 'linear-gradient(180deg,#7ec8f7 0%,#b8ecf7 70%,#ffe9b8 100%)',
@@ -129,6 +129,8 @@ let timeLeft = 0;
 let locked = false;
 let answered = false;
 let lastSceneIdx = -1;
+let correctN = 0;      // 本輪答對幾題（時間到要顯示成績）
+let over = false;      // 挑戰已結束（時間到的最終畫面）
 
 function newRound() {
   locked = false;
@@ -231,11 +233,12 @@ function nearNums(n) {
   return [...s];
 }
 function choose(btn, v) {
-  if (locked) return;
+  if (locked || over) return;
   const fb = document.getElementById('fb');
   if (v === targetN) {
     locked = true;
     answered = true;
+    correctN++;
     clearInterval(timerId);
     btn.classList.add('ok');
     Sfx.good();
@@ -255,24 +258,42 @@ function choose(btn, v) {
   }
 }
 function timeUp(tg) {
-  if (answered || locked) return;
+  if (answered || locked || over) return;
   locked = true;
+  over = true;
+  clearInterval(timerId);
+  const tEl = document.getElementById('qTimer');
+  tEl.textContent = '0';
+  tEl.classList.add('urgent');
+  // 公布正確答案，讓孩子知道為什麼
   const hit = [...document.querySelectorAll('.quiz-opt')].find(b => parseInt(b.textContent) === targetN);
   if (hit) hit.classList.add('reveal');
   const fb = document.getElementById('fb');
-  fb.textContent = '⏰ 時間到！答案是 ' + targetN + ' ' + curMw + curName + '！';
+  fb.textContent = '⏰ 時間到！答案是 ' + targetN + ' ' + curMw + curName + '。這次答對 ' + correctN + ' 題！';
   fb.className = 'feedback badf';
-  Voice.speak('時間到！答案是' + numToCN(targetN) + '！下一題加油！');
-  setTimeout(newRound, 2200);
+  Sfx.bad();
+  shake(document.getElementById('qCard'));
+  Voice.speak('時間到！答案是' + numToCN(targetN) + '。這次答對' + numToCN(correctN) + '題，再挑戰一次！');
+  // 時間到就結束這一輪，不再出下一題
+  setTimeout(() => {
+    showLose('時間到！' +
+      '<div class="sub">這次答對 <b>' + correctN + '</b> 題，共 ' + TOTAL + ' 題</div>' +
+      '<div class="sub">再挑戰一次一定更棒！</div>', start);
+  }, 1500);
 }
 function start() {
   starN = 0;
   const e = document.getElementById('starN');
   if (e) e.textContent = '0';
   round = 0;
+  correctN = 0;
+  over = false;
+  locked = false;
+  answered = false;
   lastSceneIdx = -1;
   clearInterval(timerId);
   document.getElementById('qFill').style.width = '0%';
+  document.querySelector('.quiz-pea').style.left = '0%';
   newRound();
 }
 buildHeader('⏱️ 數數限時挑戰', INSTR);
